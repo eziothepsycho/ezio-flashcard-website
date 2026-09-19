@@ -1,0 +1,332 @@
+.study-mode {
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.study-session-header,
+.study-session-tools,
+.study-nav {
+  display: flex;
+  align-items: center;
+}
+
+.study-session-header {
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.study-session-tools {
+  gap: var(--space-3);
+}
+
+.study-position {
+  color: var(--color-ink-secondary);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.study-settings-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.study-card {
+  width: 100%;
+  min-height: 340px;
+  margin: 0 0 var(--space-5);
+  padding: var(--space-7);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(145deg, var(--color-surface-raised), #222820);
+  color: var(--color-ink);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  text-align: center;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.study-card:hover,
+.study-card:focus-visible {
+  border-color: var(--color-border-strong);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.study-card-flipped {
+  border-color: var(--color-accent);
+}
+
+.study-card-side {
+  color: var(--color-ink-faint);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.study-card-text {
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1.35;
+}
+
+.study-card-hint {
+  color: var(--color-ink-faint);
+  font-size: 13px;
+}
+
+.study-rating {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.study-rating .btn {
+  min-height: 48px;
+}
+
+.study-learning {
+  color: var(--color-danger);
+}
+
+.study-known {
+  color: var(--color-accent);
+}
+
+.study-nav {
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.study-nav .btn {
+  min-width: 112px;
+}
+
+.study-finish-button {
+  margin-left: auto;
+}
+
+.study-completion {
+  padding: var(--space-7) var(--space-6);
+  text-align: center;
+  background: linear-gradient(145deg, var(--color-surface-raised), #222820);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.study-eyebrow {
+  margin-bottom: var(--space-1);
+  color: var(--color-ink-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.study-completion h2 {
+  font-size: 34px;
+  margin-bottom: var(--space-3);
+}
+
+.study-completion-counts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin: var(--space-5) 0;
+  font-size: 14px;
+}
+
+.study-completion-counts span {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+}
+
+.study-completion-note {
+  color: var(--color-ink-secondary);
+}
+
+.study-completion-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.study-completion-actions .btn {
+  width: 100%;
+  max-width: 300px;
+  min-height: 48px;
+}
+
+.study-settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background: rgba(0, 0, 0, 0.68);
+}
+
+.study-settings {
+  width: 100%;
+  max-width: 500px;
+  padding: var(--space-6);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+.study-settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.study-settings-header h2 {
+  font-size: 24px;
+}
+
+.study-close-button {
+  min-width: 36px;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.study-settings-group {
+  padding: 0;
+  margin: 0 0 var(--space-6);
+  border: 0;
+}
+
+.study-settings-group legend {
+  margin-bottom: var(--space-3);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.study-sorting-option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  margin-top: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  cursor: pointer;
+}
+
+.study-sorting-option:has(input:checked) {
+  border-color: var(--color-accent);
+  background: var(--color-accent-muted);
+}
+
+.study-sorting-option input,
+.study-front-option input {
+  flex-shrink: 0;
+  margin-top: 3px;
+  accent-color: var(--color-accent);
+}
+
+.study-sorting-option strong,
+.study-sorting-option small {
+  display: block;
+}
+
+.study-sorting-option small {
+  margin-top: var(--space-1);
+  color: var(--color-ink-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.study-front-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.study-front-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 48px;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  cursor: pointer;
+}
+
+.study-front-option:has(input:checked) {
+  border-color: var(--color-accent);
+  background: var(--color-accent-muted);
+}
+
+.study-apply-settings {
+  width: 100%;
+}
+
+@media (max-width: 520px) {
+  .study-session-header {
+    align-items: flex-start;
+  }
+
+  .study-session-tools {
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    gap: 0;
+  }
+
+  .study-settings-button span {
+    display: none;
+  }
+
+  .study-card {
+    min-height: 280px;
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .study-card-text {
+    font-size: 24px;
+  }
+
+  .study-nav .btn {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .study-completion {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .study-completion h2 {
+    font-size: 26px;
+  }
+
+  .study-settings-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .study-settings {
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: var(--space-5) var(--space-4);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+}

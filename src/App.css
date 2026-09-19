@@ -1,0 +1,112 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  padding: var(--space-5) max(var(--space-5), calc((100vw - 1120px) / 2));
+  border-bottom: 1px solid var(--color-border);
+  background: rgba(22, 24, 23, 0.78);
+  backdrop-filter: blur(12px);
+}
+
+.wordmark {
+  font-size: 30px;
+  letter-spacing: -0.04em;
+}
+
+.tagline {
+  margin-top: var(--space-2);
+  color: var(--color-ink-secondary);
+  font-size: 15px;
+}
+
+.app-main {
+  flex: 1;
+  padding: var(--space-7) var(--space-5);
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.placeholder {
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+  color: var(--color-ink-secondary);
+  background: var(--color-surface);
+}
+
+.placeholder-note {
+  margin-top: var(--space-2);
+  font-size: 13px;
+  color: var(--color-ink-faint);
+}
+
+/* Shared buttons used across the app */
+.btn {
+  font-family: var(--font-body);
+  font-size: 14px;
+  min-height: 42px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface-raised);
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #323833;
+  border-color: var(--color-ink-secondary);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn:disabled:hover {
+  background: var(--color-surface-raised);
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  border-color: var(--color-accent);
+  font-weight: 700;
+}
+
+.btn-primary:hover {
+  background: #dbff82;
+  border-color: #dbff82;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: var(--color-ink-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  min-height: 36px;
+  padding: var(--space-2);
+  border-radius: var(--radius);
+}
+
+.btn-text:hover {
+  background: var(--color-surface-raised);
+  color: var(--color-ink);
+}
+
+.btn-text-danger:hover {
+  color: var(--color-danger);
+}
+
+@media (max-width: 640px) {
+  .app-header { padding: var(--space-4); }
+  .tagline { font-size: 14px; }
+  .app-main { padding: var(--space-5) var(--space-4); }
+  .placeholder { padding: var(--space-7) var(--space-4); }
+}

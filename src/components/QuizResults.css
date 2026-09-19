@@ -1,0 +1,20 @@
+.quiz-results { max-width: 640px; margin: 0 auto; }
+.quiz-results-summary { padding: var(--space-7) var(--space-6); margin-bottom: var(--space-7); text-align: center; background: linear-gradient(145deg, var(--color-surface-raised), #22291f); border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
+.quiz-results-eyebrow, .quiz-review-answer span { display: block; margin-bottom: var(--space-1); color: var(--color-ink-secondary); font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.quiz-results-summary h2 { color: var(--color-accent); font-size: 48px; margin-bottom: var(--space-2); }
+.quiz-results-score { color: var(--color-ink-secondary); }
+.quiz-results-counts { display: flex; justify-content: center; gap: var(--space-3); margin: var(--space-5) 0; font-size: 14px; }
+.quiz-results-counts span { padding: var(--space-1) var(--space-3); border: 1px solid var(--color-border-strong); border-radius: 999px; }
+.quiz-review h3 { font-size: 20px; margin-bottom: var(--space-4); }
+.quiz-review-list { display: flex; flex-direction: column; gap: var(--space-3); padding: 0; margin: 0; list-style: none; }
+.quiz-review-item { padding: var(--space-4); border: 1px solid var(--color-border); border-left: 3px solid var(--color-ink-secondary); border-radius: var(--radius); background: var(--color-surface-raised); }
+.quiz-review-incorrect { border-left-color: var(--color-danger); }
+.quiz-review-correct { border-left-color: var(--color-accent); }
+.quiz-review-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
+.quiz-review-question { font-weight: 600; }
+.quiz-review-status { flex-shrink: 0; color: var(--color-ink-secondary); font-size: 13px; }
+.quiz-review-incorrect .quiz-review-status, .quiz-review-incorrect .quiz-review-answer:not(.quiz-review-correct-answer) { color: var(--color-danger); }
+.quiz-review-answer { margin-top: var(--space-3); }
+.quiz-review-correct-answer { padding-top: var(--space-3); border-top: 1px solid var(--color-border); }
+
+@media (max-width: 480px) { .quiz-results-summary { padding: var(--space-6) var(--space-4); } .quiz-results-summary h2 { font-size: 40px; } .quiz-review-heading { flex-direction: column; gap: var(--space-1); } }

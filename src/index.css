@@ -1,0 +1,101 @@
+:root {
+   /* Monochrome palette — dark, no pure black or white */
+  --color-bg: #161817;
+  --color-surface: #1e211f;
+  --color-surface-raised: #272b28;
+  --color-border: #393e3a;
+  --color-border-strong: #555c56;
+  --color-ink: #f1f3ee;
+  --color-ink-secondary: #b2b8b0;
+  --color-ink-faint: #7b837b;
+  --color-accent: #c9f26b;
+  --color-accent-ink: #19200e;
+  --color-accent-muted: #303b20;
+
+  /* Feedback tones stay grayscale-adjacent — weight/texture instead of color */
+  --color-danger: #d99a92;
+  --color-danger-bg: #362524;;
+
+  /* Type */
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  --radius: 10px;
+  --radius-lg: 16px;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: radial-gradient(circle at top left, #232a1e 0, var(--color-bg) 36rem);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font-family: var(--font-body);
+}
+
+input,
+textarea {
+  font-family: var(--font-body);
+}
+
+a {
+  color: inherit;
+}
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
