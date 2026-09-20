@@ -5,6 +5,8 @@
 .quiz-results-score { color: var(--color-ink-secondary); }
 .quiz-results-counts { display: flex; justify-content: center; gap: var(--space-3); margin: var(--space-5) 0; font-size: 14px; }
 .quiz-results-counts span { padding: var(--space-1) var(--space-3); border: 1px solid var(--color-border-strong); border-radius: 999px; }
+.quiz-results-actions { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); }
+.quiz-results-actions .btn { width: 100%; max-width: 300px; }
 .quiz-review h3 { font-size: 20px; margin-bottom: var(--space-4); }
 .quiz-review-list { display: flex; flex-direction: column; gap: var(--space-3); padding: 0; margin: 0; list-style: none; }
 .quiz-review-item { padding: var(--space-4); border: 1px solid var(--color-border); border-left: 3px solid var(--color-ink-secondary); border-radius: var(--radius); background: var(--color-surface-raised); }

@@ -42,3 +42,59 @@
 .quiz-option input {
   accent-color: var(--color-accent);
 }
+
+/* Quiz session setup groups: question direction + number of questions */
+.quiz-setup-group-title {
+  font-size: 16px;
+  margin-bottom: var(--space-3);
+}
+
+.quiz-option-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.quiz-option-label {
+  font-weight: 600;
+}
+
+.quiz-option-example {
+  color: var(--color-ink-secondary);
+  font-size: 13px;
+}
+
+/* Question count the user types in (replaces the old presets) */
+.quiz-count-field {
+  margin-bottom: var(--space-6);
+}
+
+.quiz-count-input {
+  width: 100%;
+  max-width: 160px;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+}
+
+.quiz-count-input:focus {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 1px;
+}
+
+.quiz-count-hint {
+  margin-top: var(--space-2);
+  color: var(--color-ink-secondary);
+  font-size: 13px;
+}
+
+.quiz-error {
+  margin-top: var(--space-2);
+  color: var(--color-danger);
+  font-size: 13px;
+}
+

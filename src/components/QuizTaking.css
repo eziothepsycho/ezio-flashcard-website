@@ -72,10 +72,6 @@
   color: var(--color-accent-ink);
 }
 
-.quiz-next {
-  width: 100%;
-}
-
 @media (max-width: 480px) {
   .quiz-taking-header { margin-bottom: var(--space-5); }
   .quiz-prompt { font-size: 23px; }

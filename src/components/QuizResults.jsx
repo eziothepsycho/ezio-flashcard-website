@@ -1,6 +1,6 @@
 import "./QuizResults.css";
 
-function QuizResults({ answers, onBack, onTryAgain }) {
+function QuizResults({ answers, onBack, onTryAgain, onHome }) {
   const correctCount = answers.filter(
     ({ question, selectedOptionId }) => selectedOptionId === question.correctOptionId
   ).length;
@@ -18,7 +18,10 @@ function QuizResults({ answers, onBack, onTryAgain }) {
           <span>{correctCount} correct</span>
           <span>{incorrectCount} incorrect</span>
         </div>
-        <button className="btn btn-primary" onClick={onTryAgain}>Try another quiz</button>
+        <div className="quiz-results-actions">
+          <button className="btn btn-primary" onClick={onTryAgain}>Try another quiz</button>
+          <button className="btn" onClick={onHome}>Go Back Home</button>
+        </div>
       </section>
       <section className="quiz-review" aria-labelledby="review-title">
         <h3 id="review-title">Review answers</h3>

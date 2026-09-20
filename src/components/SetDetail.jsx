@@ -21,7 +21,7 @@ function SetDetail({ set, onBack }) {
   const [formState, setFormState] = useState(null); // null | { mode: "create" } | { mode: "edit", card }
   const [importOpen, setImportOpen] = useState(false);
   const [mode, setMode] = useState("list"); // "list" | "study" | "quiz-setup" | "quiz" | "quiz-results"
-  const [quizConfig, setQuizConfig] = useState(null); // { count }
+  const [quizConfig, setQuizConfig] = useState(null); // { count, direction }
   const [quizAnswers, setQuizAnswers] = useState(null);
 
   const refreshCards = useCallback(() => {
@@ -57,8 +57,8 @@ function SetDetail({ set, onBack }) {
     setImportOpen(false);
   }
 
-  function handleStartQuiz(count) {
-    setQuizConfig({ count });
+  function handleStartQuiz({ count, direction }) {
+    setQuizConfig({ count, direction });
     setMode("quiz");
   }
 
@@ -106,6 +106,7 @@ function SetDetail({ set, onBack }) {
         <QuizTaking
           cards={cards}
           count={quizConfig.count}
+          direction={quizConfig.direction}
           onExit={() => setMode("list")}
           onComplete={handleQuizComplete}
         />
@@ -120,6 +121,10 @@ function SetDetail({ set, onBack }) {
           answers={quizAnswers}
           onBack={() => setMode("list")}
           onTryAgain={() => setMode("quiz-setup")}
+          onHome={() => {
+            setMode("list");
+            onBack();
+          }}
         />
       </div>
     );

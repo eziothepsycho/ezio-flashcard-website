@@ -6,14 +6,7 @@ function FlashcardList({ cards, onEdit, onDelete }) {
       {cards.map((card) => (
         <li key={card.id} className="flashcard-row">
           <div className="flashcard-row-text">
-            <div className="flashcard-row-heading">
-              <p className="flashcard-term">{card.term}</p>
-              {card.learningStatus && (
-                <span className={`card-status card-status-${card.learningStatus}`}>
-                  {card.learningStatus === "known" ? "I know this" : "Still learning"}
-                </span>
-              )}
-            </div>
+            <p className="flashcard-term">{card.term}</p>
             <p className="flashcard-definition">{card.definition}</p>
           </div>
           <div className="flashcard-row-actions">
