@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -23,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // API responses are the objects themselves, not wrapped in a "data" key:
+        // the shapes in docs/api.md are exactly what the website already expects.
+        JsonResource::withoutWrapping();
+
         // Login: 5 tries a minute per username + address, so one account or one
         // machine cannot grind through passwords.
         RateLimiter::for('login', function (Request $request) {

@@ -24,6 +24,10 @@ class AuthController extends Controller
 
     public function register(Request $request): JsonResponse
     {
+        // Trim before validating, so "  mark  " is accepted as "mark" exactly as
+        // the website's own validation does.
+        $request->merge(['username' => trim((string) $request->input('username'))]);
+
         $data = $request->validate(
             [
                 'username' => ['required', 'string', 'min:3', 'max:20', 'regex:/^[A-Za-z0-9_]+$/'],
@@ -39,7 +43,7 @@ class AuthController extends Controller
             ]
         );
 
-        $username = trim($data['username']);
+        $username = $data['username'];
 
         // The column collation is case-insensitive, so this also catches "MARK".
         if (User::where('username', $username)->exists()) {

@@ -119,6 +119,31 @@ One transactional call. `user_id` always comes from the token, never the
 payload; ids and timestamps are preserved. Steps and safety rails are in
 [`migration.md`](./migration.md).
 
+### Implemented in Phase 4 — and verified
+
+Every set and card route is live, scoped to the token's user through the model
+relations (`$request->user()->sets()->findOrFail($id)`,
+`$request->user()->cards()->findOrFail($id)`), so another account's id is a plain
+`404`. Responses go through `SetResource` / `CardResource`, which define the
+camelCase shapes above; `JsonResource::withoutWrapping()` keeps them unwrapped.
+
+Checked by the permanent test suite (`backend/tests/Feature/FlashcardApiTest.php`)
+and by a live run against the dev server and database:
+
+| Check | Result |
+| --- | --- |
+| set shape | `{id, userId, title, description, createdAt, updatedAt}`, UUID id, ISO-8601 `Z` timestamps |
+| ordering | oldest first; ties are broken by id, so records created in the same millisecond can fall back to id order |
+| set CRUD | `201` create, `200` read, `200` update with a refreshed `updatedAt`, `204` delete |
+| trim rules | blank title → `422` "Give the set a title."; `"  Biology  "` is stored as `Biology` |
+| card CRUD | `201` create, list, `200` patch, `204` delete; `learningStatus` starts `null`, accepts `known`/`learning`, and `null` clears it again |
+| bulk import | `201` with the created cards; a row missing a side → `422`; an empty import → `422` "No flashcards to import." |
+| cascade | deleting a set removes its cards (proven through the API and by counting rows) |
+| ownership matrix | nine cross-account attempts — read, patch, delete, list cards, add card, bulk import, edit card, grade card, delete card — all `404 not_found`, with the owner's set, cards and grade provably unchanged |
+| unknown/malformed ids | `404` (never a `500`), for a random UUID and for a non-UUID string alike |
+| import fields | a client-supplied `id`, `createdAt` and `updatedAt` are kept, so the Phase 8 migration can preserve what the browser already has |
+| unauthenticated | every set and card route answers `401 unauthenticated` without a token |
+
 ## Client integration (website)
 
 ```text

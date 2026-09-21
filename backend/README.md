@@ -45,6 +45,32 @@ curl http://127.0.0.1:8001/api/health
 Local settings: database `flashcard_app` on `127.0.0.1:3306`, user `root`, empty
 password. They live in `.env`, which is never committed.
 
+## Tests
+
+```bash
+php artisan test
+```
+
+- `tests/Feature/AuthTest.php` — registration (including the validation wording and
+  case-insensitive duplicates), login, invalid credentials, `/me`, logout
+  revocation, token expiry, both throttles, and tokens belonging to their account.
+- `tests/Feature/FlashcardApiTest.php` — set and card CRUD, bulk import, grading,
+  the delete cascade, ordering, and the **ownership matrix** between two accounts.
+
+They run against a **separate MySQL database** — `flashcard_app_test`, set in
+`phpunit.xml` — rather than SQLite, because case-insensitive usernames depend on
+the real column collation. Create it once if it is missing:
+
+```sql
+CREATE DATABASE flashcard_app_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+Each test refreshes the schema and runs inside a transaction, so your development
+data is never touched. `tests/TestCase.php` overrides `withToken()` to forget the
+resolved guards first: Laravel reuses one application instance across requests
+inside a single test, and without that a second request would keep the first
+token's user — making expiry and revocation look like they do not work.
+
 ## Development tips
 
 - The rate limiters live in the cache, so `php artisan cache:clear` resets them —

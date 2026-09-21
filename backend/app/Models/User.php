@@ -6,6 +6,7 @@ use App\Models\Concerns\HasUuidKey;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -52,5 +53,14 @@ class User extends Authenticatable
     public function sets(): HasMany
     {
         return $this->hasMany(Set::class);
+    }
+
+    /**
+     * Every card inside every set this user owns. Card routes query through
+     * this relation, so another account's card id is simply not found.
+     */
+    public function cards(): HasManyThrough
+    {
+        return $this->hasManyThrough(Card::class, Set::class);
     }
 }

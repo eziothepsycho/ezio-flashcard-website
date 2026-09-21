@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CardController;
+use App\Http\Controllers\Api\SetController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -44,4 +46,31 @@ Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:lo
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+
+    /*
+    |----------------------------------------------------------------------
+    | Sets
+    |----------------------------------------------------------------------
+    */
+
+    Route::get('/sets', [SetController::class, 'index']);
+    Route::post('/sets', [SetController::class, 'store']);
+    Route::get('/sets/{setId}', [SetController::class, 'show']);
+    Route::patch('/sets/{setId}', [SetController::class, 'update']);
+    Route::delete('/sets/{setId}', [SetController::class, 'destroy']);
+
+    /*
+    |----------------------------------------------------------------------
+    | Cards
+    |----------------------------------------------------------------------
+    */
+
+    // Created and listed under their set...
+    Route::get('/sets/{setId}/cards', [CardController::class, 'index']);
+    Route::post('/sets/{setId}/cards', [CardController::class, 'store']);
+    Route::post('/sets/{setId}/cards/bulk', [CardController::class, 'bulk']);
+
+    // ...then edited and deleted by their own id.
+    Route::patch('/cards/{cardId}', [CardController::class, 'update']);
+    Route::delete('/cards/{cardId}', [CardController::class, 'destroy']);
 });
