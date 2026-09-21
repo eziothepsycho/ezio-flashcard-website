@@ -4,6 +4,8 @@ A dark-mode flashcard study app — create sets, study them two different ways, 
 
 > Your flashcard sets, studied your way.
 
+**Coming soon:** a mobile app for iOS and Android.
+
 ## Features
 
 ### Flashcard sets
@@ -23,8 +25,9 @@ A dark-mode flashcard study app — create sets, study them two different ways, 
 - **Fullscreen** — the **⛶** control in the session header hands the study view to the browser's native Fullscreen API, so the card and its controls fill the screen. Esc (or the button again) returns to the normal layout with the card, session and statuses exactly as they were. Where the browser has no element fullscreen (e.g. iOS Safari), the control isn't shown.
 
 ### Quizzes
-- Pick how many questions you want (5 / 10 / 15, or all of them).
-- Multiple-choice: each question asks *"What is <term>?"* with the correct definition plus three shuffled distractors, labelled A–D.
+- Choose the question direction: **Term → Definition** or **Definition → Term** — whichever side is asked, the other side is the answer.
+- Choose how many questions you want: any whole number from 1 up to the number of cards in the set (defaults to 10, or the full set when it's smaller).
+- Multiple-choice: each question shows the prompt with the correct answer plus three shuffled distractors from the same set, labelled A–D.
 - Results screen shows your score, a correct/incorrect breakdown, and a full review of every answer, highlighting the ones you missed.
 
 ## Tech stack
@@ -100,6 +103,7 @@ Ids are `crypto.randomUUID()`; timestamps are ISO strings. `learningStatus` is `
 
 ## Possible next steps
 
+- A mobile app for iOS and Android
 - Export / import sets as JSON for backup and sharing
 - Spaced-repetition scheduling instead of a binary known / still-learning flag
 - Search, sorting, and shuffling for large sets
