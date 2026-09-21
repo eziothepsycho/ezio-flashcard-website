@@ -17,9 +17,10 @@ A dark-mode flashcard study app — create sets, study them two different ways, 
 - Bulk import: paste term-and-definition pairs straight out of a spreadsheet (TAB-separated, one per line), preview the parsed rows, and fix any bad lines before saving.
 
 ### Study Mode — two sorting styles
-- **Browsing** — standard flipping. Click the card to flip it, step through with **Previous** / **Next**, and hit **Finish** when you're done (the button becomes the primary action on the last card so you can finish early or at the end). You get a summary screen with **Restart Flashcards** and **Back to Home**.
-- **Basic sorting** — traditional sorting. Grade each card as **I Know This** or **I Don't Know This**; statuses are saved to the card and persist between visits. When you run out of cards you get a completion summary with **Study Cards I Don't Know** (a focused review session built from your "still learning" cards), **Restart All Cards**, and **Back to Home**.
+- **Browsing** — standard flipping. Click the card to flip it and step through with **Previous** / **Next**. Pressing **Next** on the last card finishes the session (the button takes the primary style there) and goes straight to a summary screen with **Restart Flashcards** and **Back to Home**.
+- **Basic sorting** — traditional sorting. Grade each card as **I Know This** or **I Don't Know This**; statuses are saved to the card and persist between visits. When you run out of cards you get a completion summary with **Study Cards I Don't Know** (a focused review session built from your "still learning" cards), **Restart All Cards**, and **Back to Home**. Every round ends on that summary — including each review round — so another round only starts when you ask for one.
 - **Options panel** — switch sorting style on the fly and choose whether the **term** or the **definition** sits on the front of the card.
+- **Fullscreen** — the **⛶** control in the session header hands the study view to the browser's native Fullscreen API, so the card and its controls fill the screen. Esc (or the button again) returns to the normal layout with the card, session and statuses exactly as they were. Where the browser has no element fullscreen (e.g. iOS Safari), the control isn't shown.
 
 ### Quizzes
 - Pick how many questions you want (5 / 10 / 15, or all of them).

@@ -31,6 +31,18 @@
   gap: var(--space-1);
 }
 
+/* Icon-only, like the settings close button; the accent marks the active state */
+.study-fullscreen-button {
+  min-width: 36px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.study-fullscreen-button[aria-pressed="true"],
+.study-fullscreen-button[aria-pressed="true"]:hover {
+  color: var(--color-accent);
+}
+
 .study-card {
   width: 100%;
   min-height: 340px;
@@ -41,13 +53,11 @@
   background: linear-gradient(145deg, var(--color-surface-raised), #222820);
   color: var(--color-ink);
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-4);
-  text-align: center;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  /* Both sides share one grid cell, so the card keeps the height of its
+     taller side and the box never shifts while the sides swap. */
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: stretch;
 }
 
 .study-card:hover,
@@ -58,6 +68,46 @@
 
 .study-card-flipped {
   border-color: var(--color-accent);
+}
+
+/* One side of the card. The arriving side waits out the leaving one, so the
+   two texts cross over one after the other instead of overlapping. */
+.study-card-face {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  text-align: center;
+  /* Arriving timing: this side waits for the other side to clear out first */
+  transition: opacity 0.17s ease-out 0.13s, transform 0.17s ease-out 0.13s;
+}
+
+/* The side showing while the card is face up */
+.study-card-front {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* The hidden side waits just below the front until the card is flipped */
+.study-card-back {
+  opacity: 0;
+  transform: translateY(10px);
+  /* Leaving timing: this side clears out first, with no delay */
+  transition: opacity 0.13s ease-out, transform 0.13s ease-out;
+}
+
+.study-card-flipped .study-card-front {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.13s ease-out, transform 0.13s ease-out;
+}
+
+.study-card-flipped .study-card-back {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.17s ease-out 0.13s, transform 0.17s ease-out 0.13s;
 }
 
 .study-card-side {
@@ -106,10 +156,6 @@
 
 .study-nav .btn {
   min-width: 112px;
-}
-
-.study-finish-button {
-  margin-left: auto;
 }
 
 .study-completion {
@@ -328,5 +374,71 @@
     overflow-y: auto;
     padding: var(--space-5) var(--space-4);
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+}
+
+/* Reduced motion: the card keeps a plain cross-fade (no sliding, no rotation)
+   rather than snapping between sides, so the change still reads as one. The
+   explicit durations intentionally out-rank the global 0.01ms cap above,
+   because this swap is the whole point of the screen. */
+@media (prefers-reduced-motion: reduce) {
+  .study-card-face {
+    transform: none !important;
+    transition: opacity 0.17s ease-out 0.13s !important;
+  }
+
+  .study-card-back,
+  .study-card-flipped .study-card-front {
+    transition: opacity 0.13s ease-out !important;
+  }
+
+  .study-card-flipped .study-card-back {
+    transition: opacity 0.17s ease-out 0.13s !important;
+  }
+}
+
+/* ---- Fullscreen -------------------------------------------------------
+   The study view itself is the fullscreen frame, so the whole screen becomes
+   study space while the card keeps a comfortable reading width. */
+.study-mode:fullscreen {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+  padding: var(--space-6) var(--space-6) var(--space-5);
+  /* Same canvas as the rest of the app, so it still feels like one site */
+  background: radial-gradient(circle at top left, #232a1e 0, var(--color-bg) 36rem);
+  display: flex;
+  flex-direction: column;
+  /* Scrolls only if the content genuinely outgrows the screen */
+  overflow-y: auto;
+}
+
+/* Card and controls stay in one column instead of stretching across a monitor */
+.study-mode:fullscreen .study-session-header,
+.study-mode:fullscreen .study-review-count,
+.study-mode:fullscreen .study-card,
+.study-mode:fullscreen .study-rating,
+.study-mode:fullscreen .study-nav,
+.study-mode:fullscreen .study-completion {
+  width: 100%;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* The card takes the height the screen has to spare */
+.study-mode:fullscreen .study-card {
+  flex: 1;
+}
+
+/* Completion screens sit in the middle of the screen rather than at the top */
+.study-mode:fullscreen .study-completion {
+  margin: auto;
+}
+
+@media (max-width: 520px) {
+  .study-mode:fullscreen {
+    padding: var(--space-4) var(--space-4) var(--space-3);
   }
 }

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./StudyMode.css";
 
 function learningCounts(cards) {
@@ -6,6 +6,35 @@ function learningCounts(cards) {
     known: cards.filter((card) => card.learningStatus === "known").length,
     learning: cards.filter((card) => card.learningStatus === "learning").length,
   };
+}
+
+// Thin wrapper around the native Fullscreen API. The element passed in becomes
+// the fullscreen frame, and every fullscreenchange — our own button, Esc or the
+// browser's own fullscreen control — flows back through the event listener, so
+// the UI can never fall out of sync with the real fullscreen state.
+function useFullscreen(targetRef) {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    function handleFullscreenChange() {
+      setIsFullscreen(document.fullscreenElement === targetRef.current);
+    }
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, [targetRef]);
+
+  function toggleFullscreen() {
+    const element = targetRef.current;
+    if (!element) return;
+    const request = document.fullscreenElement
+      ? document.exitFullscreen()
+      : element.requestFullscreen();
+    // A rejected request (no user gesture, blocked by permissions policy) must
+    // not surface as an unhandled rejection — the button follows the event.
+    if (request && typeof request.catch === "function") request.catch(() => {});
+  }
+
+  return { isFullscreen, toggleFullscreen };
 }
 
 function StudyMode({ cards, onExit, onHome, onSetStatus }) {
@@ -19,6 +48,10 @@ function StudyMode({ cards, onExit, onHome, onSetStatus }) {
   const [sessionIds, setSessionIds] = useState(() => cards.map((card) => card.id));
   const [sessionType, setSessionType] = useState("all");
   const [stage, setStage] = useState("session");
+  const frameRef = useRef(null);
+  const { isFullscreen, toggleFullscreen } = useFullscreen(frameRef);
+  // No point offering the control where the browser can't do it (e.g. iOS Safari)
+  const fullscreenSupported = document.fullscreenEnabled;
 
   const sessionCards = useMemo(
     () => sessionIds.map((id) => cards.find((card) => card.id === id)).filter(Boolean),
@@ -71,22 +104,8 @@ function StudyMode({ cards, onExit, onHome, onSetStatus }) {
   function classify(status) {
     onSetStatus(card.id, status);
 
-    if (sessionType === "review") {
-      const nextIds = status === "known"
-        ? sessionIds.filter((id) => id !== card.id)
-        : sessionIds;
-      if (!nextIds.length) {
-        setStage("success");
-        return;
-      }
-      setSessionIds(nextIds);
-      const nextIndex = status === "known"
-        ? (index >= nextIds.length ? 0 : index)
-        : (index === nextIds.length - 1 ? 0 : index + 1);
-      goTo(nextIndex);
-      return;
-    }
-
+    // Every round — all cards or a review round — ends on the completion
+    // screen. Another round only ever starts when the user asks for one.
     if (isLast) {
       setStage("complete");
     } else {
@@ -114,7 +133,7 @@ function StudyMode({ cards, onExit, onHome, onSetStatus }) {
 
   if (stage === "browsing-complete") {
     return (
-      <div className="study-mode">
+      <div className="study-mode" ref={frameRef}>
         <section className="study-completion" aria-labelledby="study-browsing-complete-title">
           <p className="study-eyebrow">Nice browsing!</p>
           <h2 id="study-browsing-complete-title">You finished browsing your flashcards.</h2>
@@ -132,22 +151,20 @@ function StudyMode({ cards, onExit, onHome, onSetStatus }) {
 
   if (stage === "complete" || stage === "success") {
     const allKnown = stage === "success" || counts.learning === 0;
+    const heading = allKnown
+      ? "You know all the cards in this set!"
+      : counts.learning === 1
+        ? "You still have 1 card to study."
+        : `You have ${counts.learning} cards you don't know yet.`;
     return (
-      <div className="study-mode">
+      <div className="study-mode" ref={frameRef}>
         <section className="study-completion" aria-labelledby="study-completion-title">
           <p className="study-eyebrow">{allKnown ? "Great job!" : "Study complete!"}</p>
-          <h2 id="study-completion-title">
-            {allKnown ? "You know all your cards." : "You finished sorting all your cards."}
-          </h2>
+          <h2 id="study-completion-title">{heading}</h2>
           <div className="study-completion-counts">
             <span>✓ I Know This: {counts.known}</span>
             <span>× I Don&apos;t Know This: {counts.learning}</span>
           </div>
-          {allKnown ? (
-            <p className="study-completion-note">All cards are now marked as “I Know This.”</p>
-          ) : (
-            <p className="study-completion-note">Review the cards you marked as still learning.</p>
-          )}
           <div className="study-completion-actions">
             {!allKnown && <button className="btn btn-primary" onClick={beginReviewSession}>Study Cards I Don&apos;t Know</button>}
             <button className={allKnown ? "btn btn-primary" : "btn"} onClick={beginAllCardsSession}>Restart All Cards</button>
@@ -161,19 +178,40 @@ function StudyMode({ cards, onExit, onHome, onSetStatus }) {
   const frontText = front === "term" ? card.term : card.definition;
   const backText = front === "term" ? card.definition : card.term;
   return (
-    <div className="study-mode">
+    <div className="study-mode" ref={frameRef}>
       <div className="study-session-header">
         <button className="btn-text back-link" onClick={onExit}>← Exit study</button>
         <div className="study-session-tools">
           <span className="study-position">{index + 1} / {activeCards.length}</span>
           <button className="btn-text study-settings-button" onClick={openSettings} aria-label="Build your session">⚙ <span>Options</span></button>
+          {fullscreenSupported && <button
+            className="btn-text study-fullscreen-button"
+            onClick={toggleFullscreen}
+            aria-pressed={isFullscreen}
+            aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+            title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+          >⛶</button>}
         </div>
       </div>
       {sorting === "basic" && sessionType === "review" && <p className="study-review-count">Cards to review: {activeCards.length}</p>}
-      <button className={`study-card ${flipped ? "study-card-flipped" : ""}`} onClick={() => setFlipped((value) => !value)} aria-label="Flip flashcard">
-        <span className="study-card-side">{flipped ? "Back" : "Front"}</span>
-        <span className="study-card-text">{flipped ? backText : frontText}</span>
-        <span className="study-card-hint">{flipped ? "Click to see the other side" : "Click to reveal"}</span>
+      {/* Keyed on card + front side + sorting so a new card mounts already
+          showing its front side instead of transitioning in from the old one. */}
+      <button
+        key={`${card.id}-${front}-${sorting}`}
+        className={`study-card${flipped ? " study-card-flipped" : ""}`}
+        onClick={() => setFlipped((value) => !value)}
+        aria-label="Flip flashcard"
+      >
+        <span className="study-card-face study-card-front">
+          <span className="study-card-side">Front</span>
+          <span className="study-card-text">{frontText}</span>
+          <span className="study-card-hint">Click to reveal</span>
+        </span>
+        <span className="study-card-face study-card-back">
+          <span className="study-card-side">Back</span>
+          <span className="study-card-text">{backText}</span>
+          <span className="study-card-hint">Click to see the other side</span>
+        </span>
       </button>
       {sorting === "basic" && <div className="study-rating" aria-label="Sort this flashcard">
         <button className="btn study-learning" onClick={() => classify("learning")}>I Don&apos;t Know This</button>
@@ -181,8 +219,8 @@ function StudyMode({ cards, onExit, onHome, onSetStatus }) {
       </div>}
       {sorting === "browsing" && <div className="study-nav">
         <button className="btn" onClick={() => goTo(index - 1)} disabled={isFirst}>Previous</button>
-        <button className="btn" onClick={() => goTo(index + 1)} disabled={isLast}>Next</button>
-        <button className={`btn study-finish-button${isLast ? " btn-primary" : ""}`} onClick={finishBrowsing}>Finish</button>
+        {/* Next finishes the session once the last card has been reached */}
+        <button className={`btn${isLast ? " btn-primary" : ""}`} onClick={() => (isLast ? finishBrowsing() : goTo(index + 1))}>Next</button>
       </div>}
       {settingsOpen && <SettingsPanel
         draftFront={draftFront}
