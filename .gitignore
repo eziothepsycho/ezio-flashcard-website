@@ -22,3 +22,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Backend (added ahead of Phase 2 — see docs/roadmap.md)
+backend/vendor/
+backend/.env
+.env
+
+# Mobile app (added ahead of Phase 10)
+mobile/.expo/
+mobile/dist
+
+# Local JSON dumps of browser data — contains real accounts, never commit it
+backups/
