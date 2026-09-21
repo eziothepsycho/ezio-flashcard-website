@@ -1,0 +1,87 @@
+.auth-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6) var(--space-5);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  padding: var(--space-6);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+.auth-card h2 {
+  font-size: 20px;
+  margin: var(--space-5) 0 var(--space-4);
+}
+
+.auth-submit {
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
+/* Password fields: the Show / Hide control sits inside the input, right-aligned */
+.password-input {
+  position: relative;
+  display: flex;
+}
+
+/* Scoped to .field so it wins over the shared .field input rule whatever
+   order the stylesheets end up in the bundle */
+.field .password-input input {
+  flex: 1;
+  padding-right: 76px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: var(--space-1);
+  transform: translateY(-50%);
+  min-height: 32px;
+  font-size: 13px;
+}
+
+/* .field-error comes from the shared form styles with a modal-sized margin;
+   inside .field the flex gap already provides the spacing */
+.field .field-error {
+  margin-bottom: 0;
+}
+
+.auth-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.auth-switch-note {
+  font-size: 14px;
+  color: var(--color-ink-secondary);
+}
+
+.auth-footnote {
+  margin-top: var(--space-5);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-ink-faint);
+}
+
+@media (max-width: 480px) {
+  .auth-screen {
+    align-items: flex-start;
+    padding: var(--space-5) var(--space-4);
+  }
+
+  .auth-card { padding: var(--space-5) var(--space-4); }
+}

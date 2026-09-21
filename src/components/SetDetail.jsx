@@ -16,7 +16,9 @@ import QuizSetup from "./QuizSetup";
 import QuizTaking from "./QuizTaking";
 import QuizResults from "./QuizResults";
 
-function SetDetail({ set, onBack }) {
+// userId comes from the signed-in account: every read and write below is
+// scoped to it, so this screen only ever shows its owner's cards.
+function SetDetail({ userId, set, onBack }) {
   const [cards, setCards] = useState([]);
   const [formState, setFormState] = useState(null); // null | { mode: "create" } | { mode: "edit", card }
   const [importOpen, setImportOpen] = useState(false);
@@ -25,21 +27,21 @@ function SetDetail({ set, onBack }) {
   const [quizAnswers, setQuizAnswers] = useState(null);
 
   const refreshCards = useCallback(() => {
-    setCards(getCardsBySet(set.id));
-  }, [set.id]);
+    setCards(getCardsBySet(set.id, userId));
+  }, [set.id, userId]);
 
   useEffect(() => {
     refreshCards();
   }, [refreshCards]);
 
   function handleCreateCard({ term, definition }) {
-    createCard({ setId: set.id, term, definition });
+    createCard({ setId: set.id, userId, term, definition });
     refreshCards();
     setFormState(null);
   }
 
   function handleEditCard({ term, definition }) {
-    updateCard(formState.card.id, { term, definition });
+    updateCard(formState.card.id, userId, { term, definition });
     refreshCards();
     setFormState(null);
   }
@@ -47,12 +49,12 @@ function SetDetail({ set, onBack }) {
   function handleDeleteCard(cardId) {
     const confirmed = window.confirm("Delete this flashcard?");
     if (!confirmed) return;
-    deleteCard(cardId);
+    deleteCard(cardId, userId);
     refreshCards();
   }
 
   function handleImportConfirm(validCards) {
-    createCards(set.id, validCards);
+    createCards(set.id, userId, validCards);
     refreshCards();
     setImportOpen(false);
   }
@@ -68,7 +70,7 @@ function SetDetail({ set, onBack }) {
   }
 
   function handleStudyStatus(cardId, learningStatus) {
-    setCardLearningStatus(cardId, learningStatus);
+    setCardLearningStatus(cardId, userId, learningStatus);
     refreshCards();
   }
 

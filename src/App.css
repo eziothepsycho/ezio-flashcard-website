@@ -9,6 +9,23 @@
   border-bottom: 1px solid var(--color-border);
   background: rgba(22, 24, 23, 0.78);
   backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+}
+
+/* Who's signed in, and the way out */
+.app-account {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.app-account-name {
+  font-size: 14px;
+  color: var(--color-ink-secondary);
 }
 
 .wordmark {
@@ -20,6 +37,17 @@
   margin-top: var(--space-2);
   color: var(--color-ink-secondary);
   font-size: 15px;
+}
+
+/* One-off message, e.g. sets adopted by the first account on a device */
+.app-notice {
+  margin-bottom: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius);
+  background: var(--color-accent-muted);
+  font-size: 14px;
 }
 
 .app-main {
@@ -105,7 +133,7 @@
 }
 
 @media (max-width: 640px) {
-  .app-header { padding: var(--space-4); }
+  .app-header { padding: var(--space-4); flex-wrap: wrap; gap: var(--space-3); }
   .tagline { font-size: 14px; }
   .app-main { padding: var(--space-5) var(--space-4); }
   .placeholder { padding: var(--space-7) var(--space-4); }
