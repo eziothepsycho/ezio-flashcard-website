@@ -47,7 +47,31 @@ case-insensitively, stored trimmed as typed; password at least 4 characters and
 never trimmed; **one identical message for unknown-user and wrong-password**;
 `register` signs you in by returning a token, exactly like today.
 
-Throttling: login `5/min` per username+IP, register `3/hour` per IP — tune later.
+Throttling: login `5/min` per username+IP, register `3/hour` per IP — both answer
+`429` in the standard error envelope **with** a `Retry-After` header.
+
+### Implemented in Phase 3 — and verified
+
+All four routes are live under `backend/`: Sanctum personal access tokens,
+bcrypt hashing, `auth:sanctum` on the protected routes. Tokens expire after
+**30 days** (`config/sanctum.php`), and logging out deletes only the token that
+made the request, so another device stays signed in. Checked over real HTTP:
+
+| Check | Result |
+| --- | --- |
+| `register` | `201` + token; user shape is exactly `{id, username, createdAt}`; no hash in the response |
+| duplicate username | `422` with `fields.username` = "That username is already taken." (case-insensitive) |
+| username/password rules | `422` with the same wording the website uses, for empty, too short and illegal characters |
+| wrong password vs unknown user | **byte-identical** `401` `invalid_credentials` bodies — no account enumeration |
+| `login` | case-insensitive; `200` + token |
+| `GET /me` | `200` with the right account; `401` with no token or a made-up one |
+| `logout` | `204`, and the same token afterwards returns `401` (revocation proven through the database) |
+| login throttling | five attempts pass, the sixth within a minute → `429` + `Retry-After` |
+| register throttling | three registrations pass, the fourth within an hour → `429` |
+| UUID keys | tokens carry a `char(36)` `tokenable_id` — Sanctum's stock numeric morph column was switched to `uuidMorphs()` |
+
+If a limit gets in the way while developing, `php artisan cache:clear` resets the
+counters (they live in the cache, not the database).
 
 ## Sets
 

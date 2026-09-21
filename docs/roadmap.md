@@ -3,18 +3,18 @@
 Where we are and what comes next. One phase per sitting, and the website keeps
 working the whole way through.
 
-**Current status:** Phase 2 complete — the Laravel API boots under `backend/`,
-`users` / `sets` / `cards` are migrated into a local MySQL (MariaDB) database and
-their constraints are verified. The one outstanding Phase 0 action is still the
-browser backup dump ([`migration.md`](./migration.md) Step 0).
+**Current status:** Phase 3 complete — the Laravel API under `backend/` handles
+registration, login, logout and `/me` with Sanctum tokens, bcrypt hashes and
+throttled endpoints, all verified over HTTP. The one outstanding Phase 0 action is
+still the browser backup dump ([`migration.md`](./migration.md) Step 0).
 
 | # | Phase | Status | Done when |
 | --- | --- | --- | --- |
 | 0 | Baseline & safety net | ✅ | account work committed; localStorage backup snippet + restore path documented; nothing else touched |
 | 1 | API contract + database schema | ✅ | `docs/api.md`, `docs/database.md`, `docs/architecture.md` agreed |
 | 2 | Backend skeleton + migrations | ✅ | Laravel 12 under `backend/`, `users`/`sets`/`cards` migrated into MySQL, `GET /api/health` → `200 {"status":"ok","database":"connected"}`, unique + cascade constraints verified |
-| 3 | Backend authentication | ⬜ next | register / login / logout / me, server-side hashing, throttling, identical failure message |
-| 4 | Backend sets + cards (+ bulk) | ⬜ | full CRUD with ownership enforced; another account's id returns 404; delete cascades |
+| 3 | Backend authentication | ✅ | `register` / `login` / `logout` / `me` with Sanctum tokens (30-day expiry, revoked on logout), bcrypt hashes, 5-per-minute login and 3-per-hour register limits — 23/23 HTTP checks passed |
+| 4 | Backend sets + cards (+ bulk) | ⬜ next | full CRUD with ownership enforced; another account's id returns 404; delete cascades |
 | 5 | Website API layer (dark launch) | ⬜ | `api/client.js`, `api/authApi.js`, `api/flashcardApi.js` exist; `dataMode` still `"local"`; site unchanged |
 | 6 | Website auth → backend | ⬜ | login/register/logout use the API; local mode still available; UX identical |
 | 7 | Website CRUD → backend | ⬜ | `App.jsx` + `SetDetail.jsx` call sites async, with loading/error states; all features re-verified per account |

@@ -2,31 +2,28 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Concerns\HasUuidKey;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
-
-    /**
-     * Ids are UUIDs supplied by the API, not auto-incrementing integers.
-     */
-    protected $keyType = 'string';
-
-    public $incrementing = false;
+    use HasApiTokens, HasFactory, HasUuidKey, Notifiable;
 
     /**
      * An account is a username and a password — nothing else is accepted.
+     * "id" is listable so an import can supply the id it already has;
+     * otherwise HasUuidKey generates one.
      *
      * @var list<string>
      */
     protected $fillable = [
+        'id',
         'username',
         'password_hash',
     ];

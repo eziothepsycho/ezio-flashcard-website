@@ -8,15 +8,16 @@ cards.
 - Database schema: [`../docs/database.md`](../docs/database.md)
 - Phases and status: [`../docs/roadmap.md`](../docs/roadmap.md)
 
-## What exists so far (Phase 2)
+## What exists so far (Phases 2-3)
 
 | Piece | Detail |
 | --- | --- |
-| Routes | `routes/api.php` — only `GET /api/health` so far |
-| Migrations | `users`, `sets`, `cards` (`database/migrations/`) |
-| Models | `User`, `Set`, `Card` (`app/Models/`) |
+| Routes | `GET /api/health`, `POST /api/register`, `POST /api/login`, `POST /api/logout`, `GET /api/me` |
+| Migrations | `users`, `sets`, `cards`, `personal_access_tokens` |
+| Models | `User`, `Set`, `Card` — UUID keys via the `HasUuidKey` trait |
+| Auth | Sanctum bearer tokens (30 days, revoked on logout), bcrypt hashes, throttled endpoints |
 
-Accounts, sets and cards arrive in phases 3 and 4.
+Sets and cards arrive in Phase 4.
 
 ## Running it locally
 
@@ -43,6 +44,15 @@ curl http://127.0.0.1:8001/api/health
 
 Local settings: database `flashcard_app` on `127.0.0.1:3306`, user `root`, empty
 password. They live in `.env`, which is never committed.
+
+## Development tips
+
+- The rate limiters live in the cache, so `php artisan cache:clear` resets them —
+  handy because 3 registrations an hour per address is easy to hit while testing.
+- `APP_DEBUG=true` locally means errors come back with full stack traces. Set it
+  to `false` in production so failures stay opaque.
+- A quick manual smoke test once the server is running:
+  `curl -X POST http://127.0.0.1:8001/api/register -H "Content-Type: application/json" -H "Accept: application/json" -d "{\"username\":\"mark\",\"password\":\"hunter2x\"}"`
 
 ## Things worth knowing
 

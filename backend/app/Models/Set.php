@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUuidKey;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,15 +14,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Set extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuidKey;
 
     protected $table = 'sets';
 
-    protected $keyType = 'string';
-
-    public $incrementing = false;
-
-    protected $fillable = ['title', 'description'];
+    protected $fillable = ['id', 'title', 'description'];
 
     public function user(): BelongsTo
     {

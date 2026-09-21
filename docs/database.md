@@ -46,8 +46,9 @@ CREATE TABLE cards (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 ```
 
-Framework tables that come for free: `migrations` (Laravel) and either
-`personal_access_tokens` (Sanctum) or a hand-rolled `tokens` table for Express.
+Framework tables that come for free: `migrations` (Laravel) and
+`personal_access_tokens` (Sanctum) — the latter with `tokenable_id` changed from
+Sanctum's numeric default to `uuidMorphs()`, because our user ids are UUIDs.
 
 ## Mapping from the current browser model
 
@@ -141,7 +142,13 @@ a local MariaDB 10.4 (`flashcard_app`) and checked directly against the server:
 | Case-insensitive usernames | inserting `mark` while `Mark` existed returned `ERROR 1062 Duplicate entry 'mark' for key 'users_username_unique'` |
 | Cascade | deleting a set removed its card (`1 → 0`) with no extra SQL |
 
-The models that map onto these tables (`app/Models/{User,Set,Card}.php`) use
-string keys with `$incrementing = false`, because ids are UUIDs. `User` hides
-`password_hash` and exposes `getAuthPassword()` so the standard guard can verify
-passwords against our column name.
+The models that map onto these tables (`app/Models/{User,Set,Card}.php`) share a
+small `HasUuidKey` trait: it sets the string key type with `$incrementing = false`
+and generates a UUID on create unless the caller supplied one (the Phase 8 import
+does supply its own ids). `User` hides `password_hash` and exposes
+`getAuthPassword()` so the standard guard can verify passwords against our column
+name.
+
+Phase 3 added Sanctum's `personal_access_tokens` table, created through
+`uuidMorphs('tokenable')` so `tokenable_id` is `char(36)` and can point at a UUID
+user; `tokenable_type` holds `App\Models\User`.
