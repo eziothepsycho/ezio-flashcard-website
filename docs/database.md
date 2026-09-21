@@ -16,7 +16,7 @@ CREATE TABLE users (
   updated_at    DATETIME(3)  NOT NULL,
   PRIMARY KEY (id),
   UNIQUE KEY uq_users_username (username)       -- case-insensitive via collation
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- A set belongs to exactly one account.
 CREATE TABLE sets (
@@ -55,7 +55,7 @@ Framework tables that come for free: `migrations` (Laravel) and either
 | --- | --- | --- |
 | `users[].id` | `users.id` | UUID — kept, so migration needs no id mapping |
 | `users[].username` | `users.username` | as typed |
-| `users[].usernameLower` | *collation* | the column exists only because JS comparison is case-sensitive; MySQL's case-insensitive collation replaces it (on MySQL 5.7 / MariaDB use `utf8mb4_unicode_ci`, or a generated stored `username_lower` + unique index) |
+| `users[].usernameLower` | *collation* | the column exists only because JS comparison is case-sensitive; the column collation (`utf8mb4_unicode_ci`) replaces it, so no lowercase field is stored |
 | `users[].passwordHash` + `salt` | `users.password_hash` | **not portable** — the local hash is client-side salted SHA-256; passwords are re-entered once |
 | `users[].createdAt` | `users.created_at` | |
 | `sets[].id` / `userId` / `title` / `description` | `sets.*` | timestamps ISO → `DATETIME(3)` |
@@ -106,8 +106,14 @@ statement — no exceptions.
   `UUID_TO_BIN()` is the space-optimised option if we ever need it; not now.
 - **No `user_id` on `cards`.** Ownership stays derived through `sets`, so there is
   exactly one place it can be wrong.
-- **Case-insensitive unique usernames** live in the collation, not in a duplicated
-  lowercase field.
+- **Case-insensitive unique usernames** live in the collation
+  (`utf8mb4_unicode_ci`), not in a duplicated lowercase field. That collation is
+  Laravel's MySQL default and is supported by both MySQL 5.7/8 and MariaDB 10.4
+  (XAMPP) — deliberately *not* `utf8mb4_0900_ai_ci`, which MariaDB does not have.
+- **`created_at` / `updated_at` are `DATETIME(3)`** and nullable at the database
+  level (Laravel's `timestamps(3)` default) — Eloquent always writes them, and the
+  API serialises them as ISO-8601 with `Z`, matching today's
+  `new Date().toISOString()` values.
 - **`learning_status` stays on `cards`** to match today's behaviour. If sets are
   ever shared between accounts, per-user progress needs its own
   `card_progress(card_id, user_id, status)` table — out of scope.
@@ -117,3 +123,25 @@ statement — no exceptions.
 - Timestamps are stored as UTC `DATETIME(3)` and serialised as ISO-8601 with `Z`,
   exactly like today's `new Date().toISOString()` values, so `new Date(...)`
   parsing in the UI keeps working.
+
+## Implemented in Phase 2 — and verified
+
+The migrations that create this schema live in
+`backend/database/migrations/` (users → sets → cards, in that order). Applied to
+a local MariaDB 10.4 (`flashcard_app`) and checked directly against the server:
+
+| Check | Result |
+| --- | --- |
+| Tables created | `users`, `sets`, `cards` (+ Laravel's `migrations`) |
+| Column collation | `utf8mb4_unicode_ci` on every table |
+| `users` shape | `id char(36)` PK, `username varchar(20)` UNIQUE, `password_hash varchar(255)`, `timestamp(3)` ×2 |
+| `sets` shape | `id` PK, `user_id char(36)` indexed FK → `users`, `title`, `description` nullable |
+| `cards` shape | `id` PK, `set_id char(36)` indexed FK → `sets`, `term`, `definition`, `learning_status enum('known','learning')` nullable |
+| Foreign keys | `sets_user_id_foreign` → `users`, `cards_set_id_foreign` → `sets` |
+| Case-insensitive usernames | inserting `mark` while `Mark` existed returned `ERROR 1062 Duplicate entry 'mark' for key 'users_username_unique'` |
+| Cascade | deleting a set removed its card (`1 → 0`) with no extra SQL |
+
+The models that map onto these tables (`app/Models/{User,Set,Card}.php`) use
+string keys with `$incrementing = false`, because ids are UUIDs. `User` hides
+`password_hash` and exposes `getAuthPassword()` so the standard guard can verify
+passwords against our column name.
