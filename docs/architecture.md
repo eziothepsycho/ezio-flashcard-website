@@ -76,9 +76,22 @@ deleted, so it doubles as the rollback path.
 changes. Inside, a single switch decides where data comes from:
 
 ```js
-// data/config.js (added in Phase 5)
+// src/data/config.js — added in Phase 5, still switched off
 export const dataMode = "local";        // "local" | "api"
 ```
+
+Phase 5 landed this layer and left it off. `src/api/client.js` centralises the
+HTTP concerns (fetch, bearer token, one error shape), and `api/authApi.js` /
+`api/flashcardApi.js` mirror `data/auth.js` and `data/db.js` name for name, so
+flipping the switch is a one-line change per screen rather than a rewrite.
+`data/storage.js` gained `loadToken` / `saveToken` / `clearToken` for the bearer
+token, kept in its own `flashcardApp:token` key so it can never be confused with
+the local account blob.
+
+Because nothing imports `src/api/*` yet, the built website bundle is byte-for-byte
+what it was before — verified by comparing the build's asset hashes. In development
+the Vite server proxies `/api` to the Laravel server on `127.0.0.1:8001`, and
+`VITE_API_URL` can point at a deployed API instead.
 
 Two deliberate signature changes when `dataMode === "api"`:
 

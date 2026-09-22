@@ -68,3 +68,33 @@ export function saveAuth(state) {
     sessionUserId: state.sessionUserId ?? null,
   });
 }
+
+// The bearer token for the future API (Phase 5+). It lives in its own key so
+// switching between local accounts and backend accounts never mixes the two,
+// and so token cleanup cannot disturb the local account blob.
+const TOKEN_KEY = "flashcardApp:token";
+
+export function loadToken() {
+  try {
+    return localStorage.getItem(TOKEN_KEY) || null;
+  } catch (err) {
+    console.error("Failed to read the saved token:", err);
+    return null;
+  }
+}
+
+export function saveToken(token) {
+  try {
+    localStorage.setItem(TOKEN_KEY, token);
+  } catch (err) {
+    console.error("Failed to save the token:", err);
+  }
+}
+
+export function clearToken() {
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+  } catch (err) {
+    console.error("Failed to clear the token:", err);
+  }
+}
