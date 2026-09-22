@@ -96,12 +96,29 @@ hook starts in a "restoring" state and asks `/me` before rendering anything, so 
 login form never flashes and authenticated content is never shown before it is
 confirmed.
 
+Phase 7 did the same for sets and cards: `data/flashcardBackend.js` exposes the
+eleven set/card calls as promises — answered from localStorage or from the API —
+so `App.jsx` and `SetDetail.jsx` now await everything. Local mode still reads its
+first list during the first render, so nothing visible changed there; API mode shows
+"Loading your sets…" / "Loading flashcards…" once and then the usual screens. Both
+screens carry an error banner (the existing `.app-notice` plus a red
+`.app-notice-error` variant) fed by messages the API client has already made
+readable, a request ticket so a slow answer cannot overwrite a newer one, and a
+`401` signs the user out rather than stranding them on a screen that cannot load.
+Grading in Study Mode updates on screen immediately and saves in the background, so
+a study session never waits on the network.
+
+`userId` deliberately stays in those signatures: in local mode it is what scopes
+data to the signed-in account (there is no server to do it), while the API ignores it
+because the token decides. Resolving the current user inside the data layer instead
+would have created an auth↔db import cycle.
+
 `VITE_DATA_MODE` is the switch (only the exact value `api` turns it on; anything
 else, including unset, stays local), and `VITE_API_URL` points at a deployed API —
 in development the Vite server proxies `/api` to the Laravel server on
 `127.0.0.1:8001`, so there is no CORS setup. Because both modes now import the API
-client, the built bundle grew by about 0.5 kB; the CSS and local behaviour are
-unchanged.
+client, the built bundle grew across phases 5–7: 254.01 kB → 254.48 kB → 259.44 kB,
+and the CSS by 0.09 kB for the error banner. Local behaviour is unchanged.
 
 Two deliberate signature changes when `dataMode === "api"`:
 

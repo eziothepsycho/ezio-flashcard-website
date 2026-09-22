@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import "./App.css";
-import { getSets, createSet, updateSet, deleteSet } from "./data/db";
+import * as flashcardBackend from "./data/flashcardBackend";
 import { useAuth } from "./data/useAuth";
 import AuthScreen from "./components/AuthScreen";
 import Dashboard from "./components/Dashboard";
@@ -9,17 +9,63 @@ import SetFormModal from "./components/SetFormModal";
 
 function App() {
   const { user, restoring, register, login, logout } = useAuth();
-  const [sets, setSets] = useState([]);
+  const [sets, setSets] = useState(() => flashcardBackend.getSetsNow(user?.id ?? null));
+  const [setsLoading, setSetsLoading] = useState(flashcardBackend.usingApi);
+  const [setsError, setSetsError] = useState("");
   const [activeSetId, setActiveSetId] = useState(null);
   const [formState, setFormState] = useState(null); // null | { mode: "create" } | { mode: "edit", set }
   const [notice, setNotice] = useState("");
 
   const userId = user?.id ?? null;
 
+  // A slow answer must never overwrite a newer one.
+  const loadTicket = useRef(0);
+
+  const handleLogout = useCallback(() => {
+    logout();
+    // Nothing from the previous session should stay on screen.
+    setSets([]);
+    setActiveSetId(null);
+    setFormState(null);
+    setNotice("");
+    setSetsError("");
+  }, [logout]);
+
+  // The data layer already turns failures into readable messages. A token the
+  // server no longer accepts sends the user back to the login screen instead of
+  // leaving them on a dashboard that cannot load.
+  const handleFailure = useCallback(
+    (err, fallback) => {
+      console.error(fallback, err);
+
+      if (err?.code === "unauthenticated") {
+        handleLogout();
+        return;
+      }
+
+      setSetsError(err?.message || fallback);
+    },
+    [handleLogout]
+  );
+
   // Only ever loads the signed-in user's sets.
-  const refreshSets = useCallback(() => {
-    setSets(userId ? getSets(userId) : []);
-  }, [userId]);
+  const refreshSets = useCallback(async () => {
+    const ticket = (loadTicket.current += 1);
+
+    try {
+      const loaded = userId ? await flashcardBackend.getSets(userId) : [];
+      if (ticket !== loadTicket.current) return;
+
+      setSets(loaded);
+      setSetsError("");
+    } catch (err) {
+      if (ticket !== loadTicket.current) return;
+
+      handleFailure(err, "Could not load your sets.");
+    } finally {
+      if (ticket === loadTicket.current) setSetsLoading(false);
+    }
+  }, [userId, handleFailure]);
 
   useEffect(() => {
     refreshSets();
@@ -37,35 +83,44 @@ function App() {
     return result;
   }
 
-  function handleLogout() {
-    logout();
-    // Nothing from the previous session should stay on screen.
-    setSets([]);
-    setActiveSetId(null);
-    setFormState(null);
-    setNotice("");
+  async function handleCreateSet({ title, description }) {
+    try {
+      await flashcardBackend.createSet({ userId, title, description });
+      setFormState(null);
+      await refreshSets();
+    } catch (err) {
+      // The form closes either way, so the message behind it stays readable.
+      setFormState(null);
+      handleFailure(err, "Could not create the set.");
+    }
   }
 
-  function handleCreateSet({ title, description }) {
-    createSet({ userId, title, description });
-    refreshSets();
-    setFormState(null);
+  async function handleEditSet({ title, description }) {
+    const setId = formState.set.id;
+
+    try {
+      await flashcardBackend.updateSet(setId, userId, { title, description });
+      setFormState(null);
+      await refreshSets();
+    } catch (err) {
+      setFormState(null);
+      handleFailure(err, "Could not save the set.");
+    }
   }
 
-  function handleEditSet({ title, description }) {
-    updateSet(formState.set.id, userId, { title, description });
-    refreshSets();
-    setFormState(null);
-  }
-
-  function handleDeleteSet(setId) {
+  async function handleDeleteSet(setId) {
     const confirmed = window.confirm(
       "Delete this set and all its flashcards? This can't be undone."
     );
     if (!confirmed) return;
-    deleteSet(setId, userId);
-    if (activeSetId === setId) setActiveSetId(null);
-    refreshSets();
+
+    try {
+      await flashcardBackend.deleteSet(setId, userId);
+      if (activeSetId === setId) setActiveSetId(null);
+      await refreshSets();
+    } catch (err) {
+      handleFailure(err, "Could not delete the set.");
+    }
   }
 
   // API mode: the session is being confirmed with the server. That is the only
@@ -107,8 +162,11 @@ function App() {
 
       <main className="app-main">
         {notice && <p className="app-notice">{notice}</p>}
+        {setsError && <p className="app-notice app-notice-error">{setsError}</p>}
 
-        {activeSet ? (
+        {setsLoading && sets.length === 0 ? (
+          <p className="tagline">Loading your sets…</p>
+        ) : activeSet ? (
           <SetDetail
             set={activeSet}
             userId={userId}

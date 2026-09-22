@@ -197,8 +197,14 @@ they already have.
 Website **accounts** use that layer as of Phase 6: `data/authBackend.js` chooses
 between `data/auth.js` and `api/authApi.js` from `dataMode`, so sign-in, sign-out
 and session restore all hit these same routes with `VITE_DATA_MODE=api` — the exact
-requests the mobile app will make. Flashcard reads and writes stay local until
-Phase 7.
+requests the mobile app will make.
+
+Phase 7 moved **sets and cards** across the same way, through
+`data/flashcardBackend.js`. Those calls are now promises in both modes, so a screen
+awaits them and then renders; failures arrive as thrown `ApiError`s carrying
+`status`, `code` and `fields` from the envelope above, which the screens show either
+in their error banner or under the matching input. Local mode still answers during
+the first render, so it never shows a loading step.
 
 ## Open questions to settle in Phase 2
 

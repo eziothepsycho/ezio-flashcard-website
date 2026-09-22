@@ -3,12 +3,12 @@
 Where we are and what comes next. One phase per sitting, and the website keeps
 working the whole way through.
 
-**Current status:** Phase 6 complete — website authentication runs against the
-Laravel API when launched with `VITE_DATA_MODE=api` (register, login, logout,
-session restore, token handling and error mapping all verified live), while the
-committed default stays `local` and the UI is unchanged. Next: Phase 7, moving
-flashcard CRUD to the API. The one outstanding Phase 0 action is still the browser
-backup dump ([`migration.md`](./migration.md) Step 0).
+**Current status:** Phase 7 complete — with `VITE_DATA_MODE=api` the website runs
+its whole account *and* flashcard flow against the Laravel API (create/edit/delete
+sets, add/edit/delete cards, import, grading, ownership refusals), while the
+committed default stays `local` and the UI is unchanged. Next: Phase 8, migrating the
+existing browser data, then flipping the default. The one outstanding Phase 0 action
+is still the browser backup dump ([`migration.md`](./migration.md) Step 0).
 
 | # | Phase | Status | Done when |
 | --- | --- | --- | --- |
@@ -19,8 +19,8 @@ backup dump ([`migration.md`](./migration.md) Step 0).
 | 4 | Backend sets + cards (+ bulk) | ✅ | set/card CRUD, bulk import and `learningStatus` grading with ownership enforced on every route; another account's ids all answer `404`; delete cascades — 30 tests / 257 assertions plus a 22-check live run |
 | 5 | Website API layer (dark launch) | ✅ | `src/api/{client,authApi,flashcardApi}.js` + `data/config.js`, token helpers in `storage.js`, Vite `/api` proxy; `dataMode` still `"local"` and the built bundle is byte-identical — 22/22 live checks through the client layer |
 | 6 | Website auth → backend | ✅ | accounts switch with `VITE_DATA_MODE=api` via `data/authBackend.js`; async session restore behind a quiet splash; per-field API errors reused; `local` remains the default and all 24 live API checks passed |
-| 7 | Website CRUD → backend | ⬜ next | `App.jsx` + `SetDetail.jsx` call sites async, with loading/error states; all features re-verified per account |
-| 8 | Migrate existing data | ⬜ | `/api/import` + one-time UI; counts match; old blob retained |
+| 7 | Website CRUD → backend | ✅ | `data/flashcardBackend.js` makes sets/cards async in both modes; `App.jsx` + `SetDetail.jsx` await, with loading, error banners, a stale-response guard, sign-out on 401 and background grading — 22/22 local checks and 24/24 live API checks |
+| 8 | Migrate existing data | ⬜ next | `/api/import` + one-time UI; counts match; old blob retained |
 | 9 | Harden + deploy the website | ⬜ | HTTPS, CORS, rate limits, DB backups, README updated; two-account isolation re-tested |
 | 10 | Mobile skeleton | ⬜ | Expo app builds; navigation; theme from the design tokens; shared utils; API client + token in SecureStore; offline screen |
 | 11 | Mobile auth | ⬜ | login / create account / logout via the shared validators; session restored with `/me` |

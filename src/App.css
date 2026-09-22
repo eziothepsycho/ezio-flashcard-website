@@ -50,6 +50,12 @@
   font-size: 14px;
 }
 
+/* The same banner, for something that went wrong */
+.app-notice-error {
+  border-left-color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
 .app-main {
   flex: 1;
   padding: var(--space-7) var(--space-5);

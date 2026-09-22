@@ -71,6 +71,7 @@ src/
 │   ├── auth.js                 # account logic: validation, password hashing, current session
 │   ├── useAuth.js              # the only React binding for auth.js: { user, restoring, register, login, logout }
 │   ├── authBackend.js          # picks data/auth.js or api/authApi.js from dataMode
+│   ├── flashcardBackend.js     # same idea for sets/cards, as promises in both modes
 │   └── config.js               # dataMode: "local" (localStorage) or "api" (the backend)
 ├── api/                        # backend client, shipped switched off (Phase 5)
 │   ├── client.js               # fetch + bearer token + one error shape for every request
@@ -118,7 +119,7 @@ src/
 
 Ids are `crypto.randomUUID()`; timestamps are ISO strings. `learningStatus` is `"known"` or `"learning"` (absent means the card hasn't been graded). Writes go through `src/data/db.js` (sets and cards) and `src/data/auth.js` (accounts) only — nothing else touches storage directly. If a blob is corrupt or unreadable, the app logs the problem and falls back to empty instead of crashing.
 
-The same data can also live in the Laravel API in `backend/` instead: `src/api/*` is a client for it, `src/data/config.js` holds the `dataMode` switch between `"local"` and `"api"`, and the website ships with `"local"` — so the site still runs entirely on `localStorage` while that path is finished off for the mobile app. Accounts already work either way: run `VITE_DATA_MODE=api npm run dev` (see `.env.example`) to sign in, register and log out against the API, with the session restored from the stored token on reload.
+The same data can also live in the Laravel API in `backend/` instead: `src/api/*` is a client for it, `src/data/config.js` holds the `dataMode` switch between `"local"` and `"api"`, and the website ships with `"local"` — so the site still runs entirely on `localStorage` while that path is finished off for the mobile app. Accounts already work either way, and so do sets and cards: run `VITE_DATA_MODE=api npm run dev` (see `.env.example`) to sign in and work with everything through the API, with the session restored from the stored token on reload.
 
 **Accounts.** Registering needs a username and a password and nothing else. Usernames are unique case-insensitively and limited to 3–20 letters, numbers or underscores; passwords are salted and hashed with SHA-256 before they are stored, and both password fields are `type="password"`. Every `db.js` function takes a `userId` and refuses to read or change anything owned by somebody else, so one account can never see another's sets. That filtering lives in the data layer — the dashboard just renders whatever it is handed. `useAuth()` is the only bridge between React and `auth.js`.
 
