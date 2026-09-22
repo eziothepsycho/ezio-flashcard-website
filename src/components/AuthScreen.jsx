@@ -121,7 +121,17 @@ function AuthScreen({ onLogin, onRegister }) {
       const result = isRegistering
         ? await onRegister(username, password)
         : await onLogin(username, password);
-      if (!result.ok) setError(result.error);
+
+      if (!result.ok) {
+        // The API can reject a field the form cannot check by itself — a taken
+        // username, for instance. Those messages belong under their own input;
+        // everything else (wrong credentials, throttling, no connection) stays in
+        // the single message above the button, exactly as before.
+        const fields = result.fields || {};
+        setUsernameError(fields.username || "");
+        setPasswordError(fields.password || "");
+        setError(fields.username || fields.password ? "" : result.error);
+      }
     } catch (err) {
       console.error("Sign-in failed:", err);
       setError("Something went wrong. Please try again.");

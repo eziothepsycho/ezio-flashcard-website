@@ -8,7 +8,7 @@ import SetDetail from "./components/SetDetail";
 import SetFormModal from "./components/SetFormModal";
 
 function App() {
-  const { user, register, login, logout } = useAuth();
+  const { user, restoring, register, login, logout } = useAuth();
   const [sets, setSets] = useState([]);
   const [activeSetId, setActiveSetId] = useState(null);
   const [formState, setFormState] = useState(null); // null | { mode: "create" } | { mode: "edit", set }
@@ -66,6 +66,21 @@ function App() {
     deleteSet(setId, userId);
     if (activeSetId === setId) setActiveSetId(null);
     refreshSets();
+  }
+
+  // API mode: the session is being confirmed with the server. That is the only
+  // thing on screen until the answer arrives, so the login form never flashes and
+  // authenticated content is never shown before it is verified. Local mode reads
+  // localStorage during the first render, so it never reaches this branch.
+  if (restoring) {
+    return (
+      <div className="auth-screen">
+        <div className="auth-card">
+          <h1 className="wordmark">cards.</h1>
+          <p className="tagline">Restoring your session…</p>
+        </div>
+      </div>
+    );
   }
 
   // No signed-in user: the whole app sits behind this screen.

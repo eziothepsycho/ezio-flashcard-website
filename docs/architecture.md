@@ -88,10 +88,20 @@ flipping the switch is a one-line change per screen rather than a rewrite.
 token, kept in its own `flashcardApp:token` key so it can never be confused with
 the local account blob.
 
-Because nothing imports `src/api/*` yet, the built website bundle is byte-for-byte
-what it was before — verified by comparing the build's asset hashes. In development
-the Vite server proxies `/api` to the Laravel server on `127.0.0.1:8001`, and
-`VITE_API_URL` can point at a deployed API instead.
+Phase 6 wired accounts to that seam: `data/authBackend.js` picks the
+implementation from `dataMode`, and `data/useAuth.js` exposes
+`{ user, restoring, register, login, logout }`. In local mode nothing changes —
+the session still comes from localStorage during the first render. In API mode the
+hook starts in a "restoring" state and asks `/me` before rendering anything, so the
+login form never flashes and authenticated content is never shown before it is
+confirmed.
+
+`VITE_DATA_MODE` is the switch (only the exact value `api` turns it on; anything
+else, including unset, stays local), and `VITE_API_URL` points at a deployed API —
+in development the Vite server proxies `/api` to the Laravel server on
+`127.0.0.1:8001`, so there is no CORS setup. Because both modes now import the API
+client, the built bundle grew by about 0.5 kB; the CSS and local behaviour are
+unchanged.
 
 Two deliberate signature changes when `dataMode === "api"`:
 

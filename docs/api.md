@@ -194,6 +194,12 @@ failure reaches the UI as `{ ok: false, error, code, fields }`, where `code` and
 `fields` come straight from the envelope above, so screens keep the error handling
 they already have.
 
+Website **accounts** use that layer as of Phase 6: `data/authBackend.js` chooses
+between `data/auth.js` and `api/authApi.js` from `dataMode`, so sign-in, sign-out
+and session restore all hit these same routes with `VITE_DATA_MODE=api` — the exact
+requests the mobile app will make. Flashcard reads and writes stay local until
+Phase 7.
+
 ## Open questions to settle in Phase 2
 
 - Laravel Sanctum tokens vs Express JWT — the contract above is identical either way.

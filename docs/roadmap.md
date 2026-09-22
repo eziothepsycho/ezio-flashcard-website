@@ -3,11 +3,12 @@
 Where we are and what comes next. One phase per sitting, and the website keeps
 working the whole way through.
 
-**Current status:** Phase 5 complete — the website has a backend client
-(`src/api/*`) that is verified against the live API but still switched off
-(`dataMode: "local"`), so the site behaves exactly as before. Next: Phase 6,
-pointing website authentication at the API. The one outstanding Phase 0 action is
-still the browser backup dump ([`migration.md`](./migration.md) Step 0).
+**Current status:** Phase 6 complete — website authentication runs against the
+Laravel API when launched with `VITE_DATA_MODE=api` (register, login, logout,
+session restore, token handling and error mapping all verified live), while the
+committed default stays `local` and the UI is unchanged. Next: Phase 7, moving
+flashcard CRUD to the API. The one outstanding Phase 0 action is still the browser
+backup dump ([`migration.md`](./migration.md) Step 0).
 
 | # | Phase | Status | Done when |
 | --- | --- | --- | --- |
@@ -17,8 +18,8 @@ still the browser backup dump ([`migration.md`](./migration.md) Step 0).
 | 3 | Backend authentication | ✅ | `register` / `login` / `logout` / `me` with Sanctum tokens (30-day expiry, revoked on logout), bcrypt hashes, 5-per-minute login and 3-per-hour register limits — 23/23 HTTP checks passed |
 | 4 | Backend sets + cards (+ bulk) | ✅ | set/card CRUD, bulk import and `learningStatus` grading with ownership enforced on every route; another account's ids all answer `404`; delete cascades — 30 tests / 257 assertions plus a 22-check live run |
 | 5 | Website API layer (dark launch) | ✅ | `src/api/{client,authApi,flashcardApi}.js` + `data/config.js`, token helpers in `storage.js`, Vite `/api` proxy; `dataMode` still `"local"` and the built bundle is byte-identical — 22/22 live checks through the client layer |
-| 6 | Website auth → backend | ⬜ next | login/register/logout use the API; local mode still available; UX identical |
-| 7 | Website CRUD → backend | ⬜ | `App.jsx` + `SetDetail.jsx` call sites async, with loading/error states; all features re-verified per account |
+| 6 | Website auth → backend | ✅ | accounts switch with `VITE_DATA_MODE=api` via `data/authBackend.js`; async session restore behind a quiet splash; per-field API errors reused; `local` remains the default and all 24 live API checks passed |
+| 7 | Website CRUD → backend | ⬜ next | `App.jsx` + `SetDetail.jsx` call sites async, with loading/error states; all features re-verified per account |
 | 8 | Migrate existing data | ⬜ | `/api/import` + one-time UI; counts match; old blob retained |
 | 9 | Harden + deploy the website | ⬜ | HTTPS, CORS, rate limits, DB backups, README updated; two-account isolation re-tested |
 | 10 | Mobile skeleton | ⬜ | Expo app builds; navigation; theme from the design tokens; shared utils; API client + token in SecureStore; offline screen |
@@ -54,6 +55,7 @@ still the browser backup dump ([`migration.md`](./migration.md) Step 0).
 | API dev server | `php artisan serve --port=8001` → `http://127.0.0.1:8001` |
 | Website dev server | `npm run dev` (Vite, port 5173) — proxies `/api` to `127.0.0.1:8001` |
 | API URL override | `VITE_API_URL` (e.g. a deployed API); defaults to `/api` |
+| Data mode | `VITE_DATA_MODE=api` runs accounts against the API; unset or `local` keeps localStorage (the committed default) |
 
 MySQL has to be running for the API to work: start it from the XAMPP Control
 Panel (**MySQL → Start**). Phase 2 was verified with a `mysqld` process started

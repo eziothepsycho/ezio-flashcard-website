@@ -34,3 +34,7 @@ mobile/dist
 
 # Local JSON dumps of browser data — contains real accounts, never commit it
 backups/
+
+# Local environment overrides (copy .env.example to .env, or use .env.local)
+.env
+.env.*.local
