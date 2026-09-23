@@ -5,9 +5,10 @@
          colors="true"
 >
     <testsuites>
-        <testsuite name="Unit">
-            <directory>tests/Unit</directory>
-        </testsuite>
+        <!-- tests/Unit and its placeholder test were removed in the cleanup batch, and
+             PHPUnit fails with "Test directory ... not found" for a testsuite pointing
+             at a missing folder. Add a <testsuite name="Unit"> block back (and create
+             the directory) if unit tests are ever written. -->
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
         </testsuite>

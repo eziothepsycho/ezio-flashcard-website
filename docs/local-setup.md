@@ -222,7 +222,7 @@ the one-shot data import. Each test rolls its work back, so your development dat
 | Wipe the app's data and recreate the tables | `php artisan migrate:fresh` |
 | Reset the rate-limit counters | `php artisan cache:clear` |
 | Re-read `backend/.env` after editing it | `php artisan config:clear` |
-| Watch API requests live while you click around | `php artisan pail` |
+| Follow the API log while you click around | `Get-Content backend\storage\logs\laravel.log -Wait` (PowerShell), or `tail -f backend/storage/logs/laravel.log` |
 | Read past errors | `backend/storage/logs/laravel.log` |
 | Stop MySQL | XAMPP Control Panel → MySQL → Stop, or `C:\xampp\mysql\bin\mysqladmin.exe -u root shutdown` |
 

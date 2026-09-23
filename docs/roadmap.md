@@ -12,12 +12,14 @@ optionally the API's) dependencies, create your own databases, and run it locall
 on your own machine, not hosted: no hosting, Docker, CI or production configuration
 belongs in this repository. The mobile app stays planned-but-not-started.
 
-The one outstanding Phase 0 action is still the browser backup dump
-([`migration.md`](./migration.md) Step 0).
+Phase 0's browser backup has since been taken as well: the dump lives in the git-ignored
+`backups/` folder, and its verified counts (3 sets, 56 cards, 2 accounts) are recorded in
+[`migration.md`](./migration.md) under *Record of the migration*. No Phase 0 action is
+outstanding.
 
 | # | Phase | Status | Done when |
 | --- | --- | --- | --- |
-| 0 | Baseline & safety net | ✅ | account work committed; localStorage backup snippet + restore path documented; nothing else touched |
+| 0 | Baseline & safety net | ✅ | account work committed; localStorage backup snippet + restore path documented; browser dump taken 2026-09-23 into the git-ignored `backups/`; nothing else touched |
 | 1 | API contract + database schema | ✅ | `docs/api.md`, `docs/database.md`, `docs/architecture.md` agreed |
 | 2 | Backend skeleton + migrations | ✅ | Laravel 12 under `backend/`, `users`/`sets`/`cards` migrated into MySQL, `GET /api/health` → `200 {"status":"ok","database":"connected"}`, unique + cascade constraints verified |
 | 3 | Backend authentication | ✅ | `register` / `login` / `logout` / `me` with Sanctum tokens (30-day expiry, revoked on logout), bcrypt hashes, 5-per-minute login and 3-per-hour register limits — 23/23 HTTP checks passed |
