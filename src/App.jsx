@@ -199,6 +199,9 @@ function App() {
         {notice && <p className="app-notice">{notice}</p>}
         {setsError && <p className="app-notice app-notice-error">{setsError}</p>}
         <ImportDataNotice
+          // The plan only counts sets that could actually be this person's (see
+          // data/localImport.js), so a brand-new account on an untouched browser —
+          // or one arriving on somebody else's device — is offered nothing.
           plan={
             importPlan &&
             !importResult &&

@@ -22,7 +22,7 @@ backup dump (Step 0 above).
 | 7 | Website CRUD → backend | ✅ | `data/flashcardBackend.js` makes sets/cards async in both modes; `App.jsx` + `SetDetail.jsx` await, with loading, error banners, a stale-response guard, sign-out on 401 and background grading — 22/22 local checks and 24/24 live API checks |
 | 8 | Migrate existing data | ✅ | `POST /api/import` + `data/localImport.js` + a one-time notice in the dashboard; ids, timestamps and grades preserved, repeats skipped, local blob untouched — 7 backend tests and 26 live checks |
 | 9 | Harden + deploy the website | ⬜ next | HTTPS, CORS, rate limits, DB backups, README updated; two-account isolation re-tested |
-| 9b | Flip the default to `api` | ⬜ | `dataMode` defaults to `api` once the migration is in the hands of your friends |
+| 9b | Flip the default to `api` | ⬜ after deploy | only once the API is live; the migration offer stays narrow — it appears only for someone who really has local data to move |
 | 10 | Mobile skeleton | ⬜ | Expo app builds; navigation; theme from the design tokens; shared utils; API client + token in SecureStore; offline screen |
 | 11 | Mobile auth | ⬜ | login / create account / logout via the shared validators; session restored with `/me` |
 | 12 | Mobile dashboard + sets | ⬜ | list, create, edit, delete, open |

@@ -123,6 +123,14 @@ and a `flashcardApp:migratedAt` marker stops the offer being made twice. The ser
 skips any id it already has, so even a repeat import cannot duplicate or steal
 anything.
 
+The offer is deliberately narrow, so nobody is told about data that is not theirs:
+a set is offered only when the local account matches the username that signed in.
+Pre-account (ownerless) sets are offered to that same person, or to the first
+account created on a browser that has no accounts yet — which mirrors the local
+mode rule. On a device that already belongs to somebody else, a new account is
+offered nothing at all, and the invitation never appears for a browser with no
+local data.
+
 `VITE_DATA_MODE` is the switch (only the exact value `api` turns it on; anything
 else, including unset, stays local), and `VITE_API_URL` points at a deployed API —
 in development the Vite server proxies `/api` to the Laravel server on

@@ -98,7 +98,9 @@ Steps 3–5 are now handled by the app itself; the rest is still worth doing by 
       with an **Import 3 sets** button. Only sets owned by the local account with
       that username, plus any saved before accounts existed, are offered; sets
       belonging to a *different* local account on the device are named but left
-      alone.
+      alone. Pre-account sets are offered only to the account holder on that
+      browser, or to the first account created on a browser that has no accounts
+      yet — so on a shared device a new account is offered nothing at all.
    3. Confirm → the client posts:
       ```json
       { "sets": [ { "id": "…", "title": "JavaScript", "description": "",
@@ -127,7 +129,7 @@ accounts, a pre-account set, a graded card, an ungraded card):
 
 | Check | Result |
 | --- | --- |
-| Plan | the local account is matched by username; its 2 sets plus the 1 pre-account set are offered; the other account's set is named and left behind; a different username offers only the pre-account set |
+| Plan | the local account is matched by username; its 2 sets plus the 1 pre-account set are offered; the other account's set is named and left behind. A brand-new username on that device is offered **nothing at all** — not the account holder's sets and not the pre-account ones — and a browser that has no accounts but does have pre-account sets offers them to whoever signs in first |
 | Payload | ids, titles, descriptions and both timestamps sent as they were; grades included; an ungraded card sends **no** `learningStatus` key at all |
 | Import | `{importedSets: 3, importedCards: 3, skipped: 0}`; the account then lists them oldest-first with the same ids and timestamps; grades intact; the pre-account set brought its card |
 | Idempotent | a second run of the same payload → `{0, 0, skipped: 6}` and the account still lists exactly 3 sets |

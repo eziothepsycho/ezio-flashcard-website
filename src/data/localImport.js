@@ -43,16 +43,25 @@ export function planImport(username) {
     }
   }
 
-  const importable = [...mine, ...unclaimed];
+  // Pre-account sets have no owner, so they may be claimed only when this browser
+  // has no accounts at all (the first person to sign in here takes them, like the
+  // local mode rule) or when the person signing in is the one who used it.
+  //
+  // That is what keeps the offer away from brand-new users: somebody arriving on a
+  // device that already belongs to someone else is offered nothing at all — not the
+  // previous user's sets (which stay in `others`, reported but never offered) and
+  // not their pre-account sets either.
+  const mayClaimUnclaimed = users.length === 0 || localUser !== null;
+  const offeredSets = mayClaimUnclaimed ? [...mine, ...unclaimed] : [...mine];
 
   return {
     localUser,
     mine,
-    unclaimed,
+    unclaimed: mayClaimUnclaimed ? unclaimed : [],
     others,
-    importable: importable.length,
+    importable: offeredSets.length,
     cardCount: cards.filter((card) =>
-      importable.some((set) => set.id === card.setId)
+      offeredSets.some((set) => set.id === card.setId)
     ).length,
     alreadyImportedAt: loadMigrationMark(),
   };
