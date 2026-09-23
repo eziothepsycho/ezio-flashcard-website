@@ -140,7 +140,7 @@ accounts, a pre-account set, a graded card, an ungraded card):
 
 | Date | Sets | Cards | Users | Notes |
 | --- | --- | --- | --- | --- |
-| _pending_ | | | | fill in after the Step 0 backup |
+| 2026-09-23 | 3 | 56 | 2 | Step 0 backup saved as `backups/cards-backup-2026-09-23.json` (git-ignored): readable, complete and referentially sound. 15 cards graded `known`, 41 ungraded, and all 3 sets belong to accounts (no pre-account sets). The browser also holds a `test1` test account. |
 
 ## Rollback
 
