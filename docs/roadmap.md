@@ -3,12 +3,17 @@
 Where we are and what comes next. One phase per sitting, and the website keeps
 working the whole way through.
 
-**Current status:** Phase 8 complete — a browser's existing sets, cards and grades
-can be imported into a backend account in one click (`POST /api/import` + a one-time
-notice), with ids and timestamps preserved, repeats skipped, and the local copy left
-untouched. Everything works end to end in `api` mode; the committed default is still
-`local`, ready to flip. The one outstanding Phase 0 action is still the browser
-backup dump (Step 0 above).
+**Current status:** Phases 0–9 complete. The website runs on `localStorage` by default
+and on the Laravel API when asked, the one-time import of existing browser data is in,
+and the repository is documented for a stranger: clone it, install the frontend (and
+optionally the API's) dependencies, create your own databases, and run it locally.
+
+**There is deliberately no deployment phase.** The project is meant to be cloned and run
+on your own machine, not hosted: no hosting, Docker, CI or production configuration
+belongs in this repository. The mobile app stays planned-but-not-started.
+
+The one outstanding Phase 0 action is still the browser backup dump
+([`migration.md`](./migration.md) Step 0).
 
 | # | Phase | Status | Done when |
 | --- | --- | --- | --- |
@@ -21,15 +26,15 @@ backup dump (Step 0 above).
 | 6 | Website auth → backend | ✅ | accounts switch with `VITE_DATA_MODE=api` via `data/authBackend.js`; async session restore behind a quiet splash; per-field API errors reused; `local` remains the default and all 24 live API checks passed |
 | 7 | Website CRUD → backend | ✅ | `data/flashcardBackend.js` makes sets/cards async in both modes; `App.jsx` + `SetDetail.jsx` await, with loading, error banners, a stale-response guard, sign-out on 401 and background grading — 22/22 local checks and 24/24 live API checks |
 | 8 | Migrate existing data | ✅ | `POST /api/import` + `data/localImport.js` + a one-time notice in the dashboard; ids, timestamps and grades preserved, repeats skipped, local blob untouched — 7 backend tests and 26 live checks |
-| 9 | Harden + deploy the website | ⬜ next | HTTPS, CORS, rate limits, DB backups, README updated; two-account isolation re-tested |
-| 9b | Flip the default to `api` | ⬜ after deploy | only once the API is live; the migration offer stays narrow — it appears only for someone who really has local data to move |
-| 10 | Mobile skeleton | ⬜ | Expo app builds; navigation; theme from the design tokens; shared utils; API client + token in SecureStore; offline screen |
-| 11 | Mobile auth | ⬜ | login / create account / logout via the shared validators; session restored with `/me` |
-| 12 | Mobile dashboard + sets | ⬜ | list, create, edit, delete, open |
-| 13 | Mobile flashcards + import | ⬜ | add / edit / delete / list; paste-based TAB import using the shared parser |
-| 14 | Mobile Study Mode | ⬜ | flipping, term/definition first, browsing, basic sorting, I Don't Know, Previous/Next, completion, "Study Cards I Don't Know", restart, back home — **no auto-loop** |
-| 15 | Mobile quiz | ⬜ | setup, both directions, custom count, A–D multiple choice, results + review |
-| 16 | Cross-device verification + ship | ⬜ | web → phone and phone → web both verified; EAS build installed; backups on |
+| 9 | Local polish: clone-and-run docs | ✅ | `README.md` rewritten around "clone it and run your own copy" (two run modes, prerequisites, numbered setup, troubleshooting), `docs/local-setup.md` added, `backend/.env.example` ships MySQL + file-store settings instead of Laravel's SQLite defaults, roadmap and backend README updated — verified by `php artisan test`, `npm run lint`, `npm run build` |
+| 9b | Flip the committed default to `api` | ✖ dropped | Not planned while there is no server to point at: `npm install && npm run dev` must keep giving a complete app with no backend. `api` stays opt-in through `VITE_DATA_MODE`, and the migration offer stays narrow — it appears only for someone who really has local data to move |
+| 10 | Mobile skeleton | ⏸ later | Expo app builds; navigation; theme from the design tokens; shared utils; API client + token in SecureStore; offline screen |
+| 11 | Mobile auth | ⏸ later | login / create account / logout via the shared validators; session restored with `/me` |
+| 12 | Mobile dashboard + sets | ⏸ later | list, create, edit, delete, open |
+| 13 | Mobile flashcards + import | ⏸ later | add / edit / delete / list; paste-based TAB import using the shared parser |
+| 14 | Mobile Study Mode | ⏸ later | flipping, term/definition first, browsing, basic sorting, I Don't Know, Previous/Next, completion, "Study Cards I Don't Know", restart, back home — **no auto-loop** |
+| 15 | Mobile quiz | ⏸ later | setup, both directions, custom count, A–D multiple choice, results + review |
+| 16 | Cross-device verification | ⏸ later | web → phone and phone → web both verified on the developer's own network; nothing published |
 
 ## Why this order
 
@@ -42,10 +47,22 @@ backup dump (Step 0 above).
   page of notes.
 - **Migration (8) after the website is fully on the API (7)** — when data moves,
   there is exactly one write path, so nothing can land in two places.
-- **Mobile last (10+)** — it consumes the same API the website has already proven,
-  and it reuses the pure logic extracted in Phase 10.
+- **Mobile last (10+)** — it consumes the same API the website has already proven, and it
+  reuses the pure helpers (`generateQuiz.js`, `parseFlashcardImport.js`) that already have
+  no browser dependencies.
+- **Docs before publishing (9)** — a repository nobody can run is not finished. The last
+  phase is making a stranger's first ten minutes work: prerequisites, a two-command quick
+  start, a local-setup walkthrough, and honest notes about what each mode does and does
+  not protect.
+- **No deployment phase** — deliberately absent. Everything here is designed to be
+  cloned and run locally; there is no server to harden, no domain, no production
+  database, and no credentials in the repository.
 
-## Local environment (this machine)
+## Example local environment (the machine this was built on)
+
+Another machine will differ — a MySQL root password, a different port, no XAMPP at all.
+`backend/.env.example` documents every setting a cloner may need to change, and
+[`local-setup.md`](./local-setup.md) walks through it step by step.
 
 | Piece | Value |
 | --- | --- |
@@ -55,7 +72,7 @@ backup dump (Step 0 above).
 | Database name | `flashcard_app` |
 | API dev server | `php artisan serve --port=8001` → `http://127.0.0.1:8001` |
 | Website dev server | `npm run dev` (Vite, port 5173) — proxies `/api` to `127.0.0.1:8001` |
-| API URL override | `VITE_API_URL` (e.g. a deployed API); defaults to `/api` |
+| API URL override | `VITE_API_URL` (another port or another machine); defaults to `/api` |
 | Data mode | `VITE_DATA_MODE=api` runs accounts against the API; unset or `local` keeps localStorage (the committed default) |
 
 MySQL has to be running for the API to work: start it from the XAMPP Control
@@ -65,6 +82,7 @@ in the background, which can be stopped with
 
 ## Not in scope (deliberately)
 
-Real-time/websocket sync, offline mutation queues, sharing sets between accounts,
-per-user progress on shared sets, password reset (there is no email by design),
-push notifications.
+Deployment of any kind (hosting, Docker, CI, production configuration, custom domains),
+real-time/websocket sync, offline mutation queues, sharing sets between accounts,
+per-user progress on shared sets, password reset (there is no email by design), push
+notifications.

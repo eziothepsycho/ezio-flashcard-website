@@ -132,7 +132,8 @@ offered nothing at all, and the invitation never appears for a browser with no
 local data.
 
 `VITE_DATA_MODE` is the switch (only the exact value `api` turns it on; anything
-else, including unset, stays local), and `VITE_API_URL` points at a deployed API —
+else, including unset, stays local), and `VITE_API_URL` points the client somewhere
+else instead (another port, or another machine) —
 in development the Vite server proxies `/api` to the Laravel server on
 `127.0.0.1:8001`, so there is no CORS setup. Because both modes now import the API
 client, the built bundle grew across phases 5–7: 254.01 kB → 254.48 kB → 259.44 kB,

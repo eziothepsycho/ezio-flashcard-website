@@ -22,6 +22,27 @@ Everything the website needs is here; the mobile app will consume the same API.
 
 ## Running it locally
 
+First time on a new machine (the full walkthrough with XAMPP screens is in
+[`../docs/local-setup.md`](../docs/local-setup.md)):
+
+```bash
+composer install                                  # PHP dependencies
+copy .env.example .env                            # cp on macOS/Linux
+php artisan key:generate
+php artisan migrate                               # creates the four tables
+```
+
+`backend/.env.example` is committed and already points at MySQL (`flashcard_app` on
+`127.0.0.1:3306`, user `root`, empty password) with `SESSION_DRIVER=file`,
+`CACHE_STORE=file` and `QUEUE_CONNECTION=sync` — this project migrates no
+sessions/cache/jobs tables, so those must not move to `database`. Change your own
+credentials in `.env`, which is never committed. The two databases a clone needs:
+
+```sql
+CREATE DATABASE flashcard_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE flashcard_app_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
 MySQL must be running first — XAMPP Control Panel → **MySQL → Start**, or from a
 terminal:
 
@@ -32,7 +53,6 @@ C:\xampp\mysql\bin\mysqld.exe --defaults-file=C:\xampp\mysql\bin\my.ini
 Stop it again with `C:\xampp\mysql\bin\mysqladmin.exe -u root shutdown`.
 
 ```bash
-php artisan migrate            # first time only
 php artisan serve --port=8001  # http://127.0.0.1:8001
 ```
 
@@ -45,7 +65,6 @@ curl http://127.0.0.1:8001/api/health
 
 Local settings: database `flashcard_app` on `127.0.0.1:3306`, user `root`, empty
 password. They live in `.env`, which is never committed.
-
 ## Tests
 
 ```bash

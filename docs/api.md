@@ -202,7 +202,8 @@ Notes for Phases 5–7:
 The layer itself exists as of Phase 5 — `src/api/client.js`, `api/authApi.js`,
 `api/flashcardApi.js` — with `dataMode` still `"local"`, so the live site is
 unaffected. In development `vite.config.js` proxies `/api` to the Laravel server on
-`127.0.0.1:8001`; `VITE_API_URL` points the client at a deployed API instead. Every
+`127.0.0.1:8001`; `VITE_API_URL` points the client elsewhere instead — another port,
+or an API running on another machine. Every
 failure reaches the UI as `{ ok: false, error, code, fields }`, where `code` and
 `fields` come straight from the envelope above, so screens keep the error handling
 they already have.
