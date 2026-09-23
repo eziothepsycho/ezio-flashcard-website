@@ -18,7 +18,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // This API has no login page and no web routes (see routes/web.php), but the
+        // framework's default guest redirect calls route('login') — a route this
+        // project has never had. A browser or curl request without
+        // `Accept: application/json` therefore threw RouteNotFoundException from the
+        // auth middleware and answered 500 instead of the documented 401.
         //
+        // The target below only ever applies to a guest on a non-API route (there are
+        // none today). Everything under /api answers the JSON envelope registered
+        // further down, so API clients get a 401 and never a redirect, whatever
+        // Accept header they send.
+        $middleware->redirectGuestsTo('/');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Everything under /api answers in one envelope, so the website and the

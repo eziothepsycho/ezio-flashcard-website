@@ -129,3 +129,10 @@ token's user — making expiry and revocation look like they do not work.
   proxies to. The framework's default `GET /` welcome page and the test covering it
   were removed in Phase 10: `GET /` is a plain 404 now, `/api/health` and the
   framework's `/up` are unaffected, and nothing else routes through `routes/web.php`.
+- **Guests are never redirected to a login page.** The framework defaults its guest
+  redirect to `route('login')`, a route this project has never had; asking for it threw
+  `RouteNotFoundException` from the auth middleware, so a browser or `curl` request
+  without `Accept: application/json` answered `500` instead of the documented `401`.
+  `bootstrap/app.php` now points that redirect at `/` (which only matters for a guest
+  on a non-API route — there are none), so `/api` answers its JSON envelope either way.
+  `tests/Feature/AuthTest.php` guards it.

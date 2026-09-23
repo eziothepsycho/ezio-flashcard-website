@@ -32,6 +32,11 @@ server proxies `/api` to the backend, so there is no CORS juggling in dev.
   ```
 - Status codes: `200`/`201`/`204` success, `401` not signed in, `404` missing or
   not yours, `409` stale write, `422` validation, `429` throttled.
+- **No redirects.** Every path under `/api` answers JSON whatever `Accept` header the
+  client sends, or none at all: a guest gets `401 unauthenticated` and an unknown path
+  gets `404 not_found`. The API never bounces a caller to a login page — it has no
+  login route and no views at all (see `backend/routes/web.php`). The only non-JSON
+  response in the app is the framework's `GET /` 404, which no client uses.
 
 ## Accounts
 

@@ -255,6 +255,7 @@ the one-shot data import. Each test rolls its work back, so your development dat
 | The log file cannot be opened / permission denied | macOS/Linux: `chmod -R 775 backend/storage backend/bootstrap/cache` |
 | `419` or CSRF messages | You are hitting the API with a browser form instead of the app; the API is token-based, so use the website or `curl` with an `Authorization: Bearer` header |
 | `422` with a `fields` object | Validation refused the input — the website shows those messages next to the named field |
+| Opening an `/api/...` address in a browser shows `{"error":{"code":"unauthenticated","message":"You are not signed in."}}` | That is the API answering correctly, not an error page: it needs a bearer token and it never redirects to a login screen. Sign in through the website, or send an `Authorization: Bearer <token>` header |
 
 Every API error answers in one shape, so a failure is always readable:
 `{"error":{"code":"…","message":"…","fields":{…}}}` (see

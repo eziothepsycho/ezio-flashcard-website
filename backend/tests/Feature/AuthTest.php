@@ -175,6 +175,32 @@ class AuthTest extends TestCase
         $this->withToken('not-even-a-token')->getJson('/api/me')->assertStatus(401);
     }
 
+    public function test_a_guest_without_a_json_accept_header_gets_the_envelope(): void
+    {
+        // Browsers send `Accept: text/html,...`, curl sends `*/*`, and a plain
+        // request may send no Accept header at all. Those used to send the auth
+        // middleware looking for a `login` route this API has never had, turning the
+        // documented 401 into `500 Route [login] not defined`.
+        $browserAccept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+
+        foreach (['/api/sets', '/api/me'] as $path) {
+            $this->get($path)
+                ->assertStatus(401)
+                ->assertHeader('Content-Type', 'application/json')
+                ->assertJsonPath('error.code', 'unauthenticated')
+                ->assertJsonPath('error.message', 'You are not signed in.');
+
+            $this->withHeaders(['Accept' => $browserAccept])->get($path)->assertStatus(401);
+            $this->withHeaders(['Accept' => '*/*'])->get($path)->assertStatus(401);
+        }
+
+        // A bodyless POST from a browser form answers the same way.
+        $this->withHeaders(['Accept' => $browserAccept])
+            ->post('/api/import', [])
+            ->assertStatus(401)
+            ->assertJsonPath('error.code', 'unauthenticated');
+    }
+
     public function test_logout_revokes_only_the_token_it_was_given(): void
     {
         // Registering signs you in, so there are three tokens: the one from
