@@ -83,16 +83,22 @@ So each person **re-enters their password once** when their account is created
 (or first logs in) on the backend. That is a one-time, expected step — not data
 loss. The sets and cards attached to that account move across intact.
 
-## The runbook (Phase 8)
+## The runbook (implemented in Phase 8)
 
-1. **Backend ready** — Phase 3–4 done; `/api/import` exists and is tested with curl.
-2. **Website switched** — Phase 6–7 done, so login and CRUD already go through the API.
+Steps 3–5 are now handled by the app itself; the rest is still worth doing by hand.
+
+1. **Backend ready** — ✅ `/api/import` exists, is throttled like everything else, and is covered by `backend/tests/Feature/ImportTest.php`.
+2. **Website switched** — ✅ accounts and flashcard CRUD both go through the API when `VITE_DATA_MODE=api`.
 3. **Each person, on their own browser:**
-   1. Log in on the website against the backend with the same username (creating
-      the account with the same password the first time).
-   2. The site detects local data for that account and offers
-      **"Import my local sets (N)"** — shown only when the local blob still has
-      sets for that user (or `legacy-local-device` sets).
+   1. Log in on the website against the backend, using the same username as the
+      local account (creating it the first time — the password is re-entered
+      because the local hash cannot be reused).
+   2. The dashboard shows a one-time notice:
+      **"3 sets in this browser can be added to your account (12 flashcards)"**
+      with an **Import 3 sets** button. Only sets owned by the local account with
+      that username, plus any saved before accounts existed, are offered; sets
+      belonging to a *different* local account on the device are named but left
+      alone.
    3. Confirm → the client posts:
       ```json
       { "sets": [ { "id": "…", "title": "JavaScript", "description": "",
@@ -103,12 +109,30 @@ loss. The sets and cards attached to that account move across intact.
       ```
       to `POST /api/import`.
    4. The server assigns `user_id` from the token, inserts everything in one
-      transaction, and returns `{ importedSets, importedCards, skipped }`.
-4. **Verify** — compare the counts from Step 0 with the site's set/card counts and
-   spot-check one set with graded cards.
-5. **Record it** — write `flashcardApp:migratedAt` so the importer is never
-   offered twice, and note the counts in this file (below).
-6. **Keep the old blob.** It is the rollback path and costs a few kilobytes.
+      transaction, keeps ids and timestamps, and answers
+      `{ "importedSets": 3, "importedCards": 12, "skipped": 0 }`. Anything whose id
+      is already stored is counted under `skipped` instead of taken over — so the
+      same import can be run again safely.
+4. **Verify** — the notice is replaced by a summary ("3 sets and 12 flashcards
+   added to your account"), and the dashboard lists them.
+5. **Record it** — the browser writes `flashcardApp:migratedAt`, so the offer is
+   never made twice.
+6. **Keep the old blob.** Untouched by design: it is the rollback path, local mode
+   still works, and nothing was deleted.
+
+### Implemented in Phase 8 — and verified
+
+Checked against the live API with a browser's worth of local data (two local
+accounts, a pre-account set, a graded card, an ungraded card):
+
+| Check | Result |
+| --- | --- |
+| Plan | the local account is matched by username; its 2 sets plus the 1 pre-account set are offered; the other account's set is named and left behind; a different username offers only the pre-account set |
+| Payload | ids, titles, descriptions and both timestamps sent as they were; grades included; an ungraded card sends **no** `learningStatus` key at all |
+| Import | `{importedSets: 3, importedCards: 3, skipped: 0}`; the account then lists them oldest-first with the same ids and timestamps; grades intact; the pre-account set brought its card |
+| Idempotent | a second run of the same payload → `{0, 0, skipped: 6}` and the account still lists exactly 3 sets |
+| Isolation | the other local account's set never appears in the account, and a different backend account importing the same ids gets `skipped` rather than a takeover (covered by PHPUnit too) |
+| Safety | the local `flashcardApp:data` and `flashcardApp:auth` blobs are **byte-for-byte unchanged** afterwards, and the failure cases (no auth, bad payloads) leave zero rows behind |
 
 ### Record of the migration
 

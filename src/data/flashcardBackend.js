@@ -69,3 +69,17 @@ export const deleteCard = (cardId, userId) =>
   usingApi
     ? api.deleteCard(cardId)
     : Promise.resolve(local.deleteCard(cardId, userId));
+
+/**
+ * The one-shot migration (docs/migration.md) only makes sense in API mode: when
+ * the data already lives in localStorage there is nothing to move.
+ *
+ * @param {{sets: Array<object>}} payload
+ */
+export const importSets = (payload) => {
+  if (!usingApi) {
+    throw new Error('Importing local data only applies when dataMode is "api".');
+  }
+
+  return api.importSets(payload);
+};

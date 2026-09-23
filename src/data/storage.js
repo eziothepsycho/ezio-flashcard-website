@@ -98,3 +98,25 @@ export function clearToken() {
     console.error("Failed to clear the token:", err);
   }
 }
+
+// When this browser's local data was last copied into a backend account
+// (Phase 8). It is only a marker so the one-time offer is not shown again — the
+// local data itself is never touched or deleted.
+const MIGRATION_KEY = "flashcardApp:migratedAt";
+
+export function loadMigrationMark() {
+  try {
+    return localStorage.getItem(MIGRATION_KEY) || null;
+  } catch (err) {
+    console.error("Failed to read the migration mark:", err);
+    return null;
+  }
+}
+
+export function saveMigrationMark(value) {
+  try {
+    localStorage.setItem(MIGRATION_KEY, value);
+  } catch (err) {
+    console.error("Failed to save the migration mark:", err);
+  }
+}

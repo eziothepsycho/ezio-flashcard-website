@@ -113,6 +113,16 @@ data to the signed-in account (there is no server to do it), while the API ignor
 because the token decides. Resolving the current user inside the data layer instead
 would have created an auth↔db import cycle.
 
+Phase 8 added the one-way move of existing browser data into an account:
+`data/localImport.js` reads the local blob, works out which sets belong to the
+signed-in username plus which were saved before accounts existed, and builds the
+`POST /api/import` payload with the ids and timestamps the browser already used.
+`components/ImportDataNotice.jsx` is the one-time offer and its result. Nothing is
+ever deleted locally — the blob is the rollback path and local mode keeps working —
+and a `flashcardApp:migratedAt` marker stops the offer being made twice. The server
+skips any id it already has, so even a repeat import cannot duplicate or steal
+anything.
+
 `VITE_DATA_MODE` is the switch (only the exact value `api` turns it on; anything
 else, including unset, stays local), and `VITE_API_URL` points at a deployed API —
 in development the Vite server proxies `/api` to the Laravel server on

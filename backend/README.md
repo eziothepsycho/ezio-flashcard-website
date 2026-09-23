@@ -8,16 +8,17 @@ cards.
 - Database schema: [`../docs/database.md`](../docs/database.md)
 - Phases and status: [`../docs/roadmap.md`](../docs/roadmap.md)
 
-## What exists so far (Phases 2-3)
+## What exists so far (Phases 2-8)
 
 | Piece | Detail |
 | --- | --- |
-| Routes | `GET /api/health`, `POST /api/register`, `POST /api/login`, `POST /api/logout`, `GET /api/me` |
+| Routes | `GET /api/health`; `POST /api/register`, `POST /api/login`, `POST /api/logout`, `GET /api/me`; sets (`GET/POST /api/sets`, `GET/PATCH/DELETE /api/sets/{id}`); cards (`GET/POST /api/sets/{id}/cards`, `POST …/cards/bulk`, `PATCH/DELETE /api/cards/{id}`); `POST /api/import` |
 | Migrations | `users`, `sets`, `cards`, `personal_access_tokens` |
 | Models | `User`, `Set`, `Card` — UUID keys via the `HasUuidKey` trait |
 | Auth | Sanctum bearer tokens (30 days, revoked on logout), bcrypt hashes, throttled endpoints |
+| Migration | `POST /api/import` brings a browser's sets, cards and grades into the account, keeping ids and timestamps; anything already stored is skipped |
 
-Sets and cards arrive in Phase 4.
+Everything the website needs is here; the mobile app will consume the same API.
 
 ## Running it locally
 
@@ -56,6 +57,8 @@ php artisan test
   revocation, token expiry, both throttles, and tokens belonging to their account.
 - `tests/Feature/FlashcardApiTest.php` — set and card CRUD, bulk import, grading,
   the delete cascade, ordering, and the **ownership matrix** between two accounts.
+- `tests/Feature/ImportTest.php` — the one-shot migration: ids, timestamps and
+  grades preserved, repeats skipped, and another account unable to take over ids.
 
 They run against a **separate MySQL database** — `flashcard_app_test`, set in
 `phpunit.xml` — rather than SQLite, because case-insensitive usernames depend on

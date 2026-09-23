@@ -14,6 +14,7 @@ A dark-mode flashcard study app — sign in, create sets, study them two differe
 - Every account has its own sets and flashcards. You only ever see your own.
 - Stay signed in between visits; **Log out** clears the session and returns you to the Login screen.
 - Sets saved before accounts existed are handed to the first account created on that device — nothing is ever deleted.
+- When the site runs against the API (`VITE_DATA_MODE=api`), the sets this browser already holds can be brought into your account in one click — your local copy is left exactly as it is.
 
 ### Flashcard sets
 - Create, rename, and delete sets (each with an optional description).

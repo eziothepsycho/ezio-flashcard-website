@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CardController;
+use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\SetController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -73,4 +74,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // ...then edited and deleted by their own id.
     Route::patch('/cards/{cardId}', [CardController::class, 'update']);
     Route::delete('/cards/{cardId}', [CardController::class, 'destroy']);
+
+    /*
+    |----------------------------------------------------------------------
+    | Migration
+    |----------------------------------------------------------------------
+    */
+
+    // One transactional call that brings the sets and cards a browser already
+    // holds into this account. Anything already stored is skipped.
+    Route::post('/import', [ImportController::class, 'store']);
 });

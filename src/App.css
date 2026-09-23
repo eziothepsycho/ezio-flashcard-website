@@ -56,6 +56,11 @@
   background: var(--color-danger-bg);
 }
 
+/* A banner that carries an action, e.g. the one-time import offer */
+.app-notice .btn {
+  margin-top: var(--space-3);
+}
+
 .app-main {
   flex: 1;
   padding: var(--space-7) var(--space-5);

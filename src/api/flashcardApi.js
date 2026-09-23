@@ -29,3 +29,10 @@ export const setCardLearningStatus = (cardId, learningStatus) =>
   patch(`/cards/${cardId}`, { learningStatus });
 
 export const deleteCard = (cardId) => del(`/cards/${cardId}`);
+
+/**
+ * One-shot migration of the data a browser already holds (docs/migration.md).
+ * The server keeps the ids it is given, assigns the account from the token, and
+ * skips anything already stored, so sending the same payload twice is harmless.
+ */
+export const importSets = (payload) => post("/import", payload);

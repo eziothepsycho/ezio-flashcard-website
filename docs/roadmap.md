@@ -3,12 +3,12 @@
 Where we are and what comes next. One phase per sitting, and the website keeps
 working the whole way through.
 
-**Current status:** Phase 7 complete — with `VITE_DATA_MODE=api` the website runs
-its whole account *and* flashcard flow against the Laravel API (create/edit/delete
-sets, add/edit/delete cards, import, grading, ownership refusals), while the
-committed default stays `local` and the UI is unchanged. Next: Phase 8, migrating the
-existing browser data, then flipping the default. The one outstanding Phase 0 action
-is still the browser backup dump ([`migration.md`](./migration.md) Step 0).
+**Current status:** Phase 8 complete — a browser's existing sets, cards and grades
+can be imported into a backend account in one click (`POST /api/import` + a one-time
+notice), with ids and timestamps preserved, repeats skipped, and the local copy left
+untouched. Everything works end to end in `api` mode; the committed default is still
+`local`, ready to flip. The one outstanding Phase 0 action is still the browser
+backup dump (Step 0 above).
 
 | # | Phase | Status | Done when |
 | --- | --- | --- | --- |
@@ -20,8 +20,9 @@ is still the browser backup dump ([`migration.md`](./migration.md) Step 0).
 | 5 | Website API layer (dark launch) | ✅ | `src/api/{client,authApi,flashcardApi}.js` + `data/config.js`, token helpers in `storage.js`, Vite `/api` proxy; `dataMode` still `"local"` and the built bundle is byte-identical — 22/22 live checks through the client layer |
 | 6 | Website auth → backend | ✅ | accounts switch with `VITE_DATA_MODE=api` via `data/authBackend.js`; async session restore behind a quiet splash; per-field API errors reused; `local` remains the default and all 24 live API checks passed |
 | 7 | Website CRUD → backend | ✅ | `data/flashcardBackend.js` makes sets/cards async in both modes; `App.jsx` + `SetDetail.jsx` await, with loading, error banners, a stale-response guard, sign-out on 401 and background grading — 22/22 local checks and 24/24 live API checks |
-| 8 | Migrate existing data | ⬜ next | `/api/import` + one-time UI; counts match; old blob retained |
-| 9 | Harden + deploy the website | ⬜ | HTTPS, CORS, rate limits, DB backups, README updated; two-account isolation re-tested |
+| 8 | Migrate existing data | ✅ | `POST /api/import` + `data/localImport.js` + a one-time notice in the dashboard; ids, timestamps and grades preserved, repeats skipped, local blob untouched — 7 backend tests and 26 live checks |
+| 9 | Harden + deploy the website | ⬜ next | HTTPS, CORS, rate limits, DB backups, README updated; two-account isolation re-tested |
+| 9b | Flip the default to `api` | ⬜ | `dataMode` defaults to `api` once the migration is in the hands of your friends |
 | 10 | Mobile skeleton | ⬜ | Expo app builds; navigation; theme from the design tokens; shared utils; API client + token in SecureStore; offline screen |
 | 11 | Mobile auth | ⬜ | login / create account / logout via the shared validators; session restored with `/me` |
 | 12 | Mobile dashboard + sets | ⬜ | list, create, edit, delete, open |

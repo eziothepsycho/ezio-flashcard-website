@@ -1,9 +1,11 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import "./App.css";
 import * as flashcardBackend from "./data/flashcardBackend";
+import * as localImport from "./data/localImport";
 import { useAuth } from "./data/useAuth";
 import AuthScreen from "./components/AuthScreen";
 import Dashboard from "./components/Dashboard";
+import ImportDataNotice from "./components/ImportDataNotice";
 import SetDetail from "./components/SetDetail";
 import SetFormModal from "./components/SetFormModal";
 
@@ -15,6 +17,8 @@ function App() {
   const [activeSetId, setActiveSetId] = useState(null);
   const [formState, setFormState] = useState(null); // null | { mode: "create" } | { mode: "edit", set }
   const [notice, setNotice] = useState("");
+  const [importBusy, setImportBusy] = useState(false);
+  const [importResult, setImportResult] = useState(null);
 
   const userId = user?.id ?? null;
 
@@ -29,6 +33,8 @@ function App() {
     setFormState(null);
     setNotice("");
     setSetsError("");
+    setImportResult(null);
+    setImportBusy(false);
   }, [logout]);
 
   // The data layer already turns failures into readable messages. A token the
@@ -70,6 +76,15 @@ function App() {
   useEffect(() => {
     refreshSets();
   }, [refreshSets]);
+
+  // API mode only: once, offer to bring the sets this browser already holds into
+  // the account that is signed in. Read during render, because localStorage can
+  // answer straight away — no effect, no flash.
+  const importPlan = useMemo(() => {
+    if (!flashcardBackend.usingApi || !user) return null;
+
+    return localImport.planImport(user.username);
+  }, [user]);
 
   async function handleRegister(username, password) {
     const result = await register(username, password);
@@ -123,6 +138,26 @@ function App() {
     }
   }
 
+  // The one-time migration: send what this browser holds and leave the local copy
+  // exactly where it is (docs/migration.md).
+  async function handleImportLocalData() {
+    if (!importPlan) return;
+
+    setImportBusy(true);
+    try {
+      const result = await flashcardBackend.importSets(
+        localImport.buildImportPayload(importPlan)
+      );
+      localImport.markImported();
+      setImportResult(result);
+      await refreshSets();
+    } catch (err) {
+      handleFailure(err, "Could not import this browser's sets.");
+    } finally {
+      setImportBusy(false);
+    }
+  }
+
   // API mode: the session is being confirmed with the server. That is the only
   // thing on screen until the answer arrives, so the login form never flashes and
   // authenticated content is never shown before it is verified. Local mode reads
@@ -163,6 +198,19 @@ function App() {
       <main className="app-main">
         {notice && <p className="app-notice">{notice}</p>}
         {setsError && <p className="app-notice app-notice-error">{setsError}</p>}
+        <ImportDataNotice
+          plan={
+            importPlan &&
+            !importResult &&
+            !importPlan.alreadyImportedAt &&
+            importPlan.importable > 0
+              ? importPlan
+              : null
+          }
+          result={importResult}
+          busy={importBusy}
+          onImport={handleImportLocalData}
+        />
 
         {setsLoading && sets.length === 0 ? (
           <p className="tagline">Loading your sets…</p>

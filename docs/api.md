@@ -119,6 +119,19 @@ One transactional call. `user_id` always comes from the token, never the
 payload; ids and timestamps are preserved. Steps and safety rails are in
 [`migration.md`](./migration.md).
 
+**Implemented in Phase 8.** The endpoint is live and idempotent:
+
+- ids are checked across the whole table, so an import can never take over a set
+  that already exists (whether it is another account's or the same account's) —
+  those items are counted in `skipped` (a set counts 1 plus its cards);
+- `createdAt` / `updatedAt` are kept when supplied, so nothing looks different
+  after the move, and a card with no `learningStatus` stays ungraded;
+- validation answers `422` with the field map (`sets.0.id`, `sets.0.title`, …),
+  and the route needs a token like every other account route;
+- verified by `backend/tests/Feature/ImportTest.php` (7 tests) and a live run
+  that migrated a browser's sets, cards and grades, then proved the local copy
+  was byte-for-byte unchanged.
+
 ### Implemented in Phase 4 — and verified
 
 Every set and card route is live, scoped to the token's user through the model
