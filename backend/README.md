@@ -121,3 +121,11 @@ token's user — making expiry and revocation look like they do not work.
 - `database/seeders/DatabaseSeeder.php` deliberately seeds nothing: accounts are
   created through `POST /api/register`, so a fresh database has no known
   credentials.
+- **API-only, on purpose.** There are no views, no asset build and no
+  `package.json`/`vite.config.js`/`resources/` in here — the website is the separate
+  Vite/React app in the project root, and `routes/web.php` is now an empty placeholder
+  that `bootstrap/app.php` still registers for the `web` routes. `composer run dev`
+  therefore just starts `php artisan serve --port=8001`, the port `vite.config.js`
+  proxies to. The framework's default `GET /` welcome page and the test covering it
+  were removed in Phase 10: `GET /` is a plain 404 now, `/api/health` and the
+  framework's `/up` are unaffected, and nothing else routes through `routes/web.php`.

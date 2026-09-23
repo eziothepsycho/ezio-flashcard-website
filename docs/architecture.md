@@ -159,7 +159,7 @@ in Phase 7.
 flashcard-app/                 ← current repo; the website stays at the root
 ├── index.html, vite.config.js, package.json, src/     (website — unchanged tooling)
 ├── docs/                       ← this folder (plan of record)
-├── backend/                    Phase 2+  Laravel or Express API (own deps)
+├── backend/                    Phase 2+  Laravel 12 API — API-only, no npm side
 ├── mobile/                     Phase 10+ Expo app (own deps, own node_modules)
 ├── shared/                     Phase 10+ pure logic used by both clients
 │   ├── generateQuiz.js
@@ -168,10 +168,12 @@ flashcard-app/                 ← current repo; the website stays at the root
 └── backups/                    local JSON dumps of browser data (git-ignored)
 ```
 
-Each app keeps its own `package.json`; no npm workspaces at first. The website
-reaches `shared/` through a Vite alias, the Expo app through
-`metro.config.js` `watchFolders` — and if Metro objects, copy the two tiny
-util files into `mobile/lib/` instead of adding a monorepo tool.
+The website and the Expo app each keep their own `package.json`; no npm workspaces at
+first. `backend/` has none at all — it is PHP only, serves JSON, and builds no assets
+(the framework's default `resources/`, `vite.config.js` and `package.json` were removed
+in Phase 10). The website reaches `shared/` through a Vite alias, the Expo app through
+`metro.config.js` `watchFolders` — and if Metro objects, copy the two tiny util files
+into `mobile/lib/` instead of adding a monorepo tool.
 
 ## Reuse map
 
