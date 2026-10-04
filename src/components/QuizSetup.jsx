@@ -1,35 +1,6 @@
 import { useState } from "react";
 import "./QuizSetup.css";
-
-// Validates the number of questions the user typed in. Returns a
-// clear error message, or null when the value can start a quiz.
-function validateQuestionCount(rawValue, totalCards) {
-  const value = rawValue.trim();
-
-  if (value === "") {
-    return "Enter the number of questions you want.";
-  }
-
-  // Plain digits only, so decimals ("2.5"), negative numbers ("-3")
-  // and letters are rejected before any maths happens.
-  if (!/^\d+$/.test(value)) {
-    return "Enter a whole number of questions (no decimals or negative numbers).";
-  }
-
-  const count = Number(value);
-
-  if (count < 1) {
-    return "The number of questions must be at least 1.";
-  }
-
-  if (count > totalCards) {
-    const questionWord = totalCards === 1 ? "question" : "questions";
-    const cardWord = totalCards === 1 ? "flashcard" : "flashcards";
-    return `You can only create a quiz with up to ${totalCards} ${questionWord} because this set contains ${totalCards} ${cardWord}.`;
-  }
-
-  return null;
-}
+import { validateQuestionCount } from "../../shared/validation.js";
 
 // Which side of each flashcard becomes the question.
 const QUESTION_DIRECTIONS = [

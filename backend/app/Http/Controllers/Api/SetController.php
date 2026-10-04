@@ -21,7 +21,10 @@ class SetController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         // Oldest first, matching the order the browser has always listed them in.
+        // withCount('cards') adds cards_count for the whole list in one extra
+        // query, so SetResource can report cardsCount without N+1 lookups.
         $sets = $request->user()->sets()
+            ->withCount('cards')
             ->orderBy('created_at')
             ->orderBy('id')
             ->get();

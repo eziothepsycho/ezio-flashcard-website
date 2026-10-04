@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "cards.",
+    "slug": "cards-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#161817",
+    "platforms": [
+      "android",
+      "ios"
+    ],
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "edgeToEdgeEnabled": true,
+      "package": "com.eziothepsycho.cards"
+    },
+    "plugins": [
+      "expo-status-bar",
+      "expo-secure-store",
+      "expo-sqlite",
+      "./plugins/withGradleSafeProjectName.js",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
+    ]
+  }
+}

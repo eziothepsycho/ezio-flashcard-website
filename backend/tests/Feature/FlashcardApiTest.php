@@ -129,6 +129,51 @@ class FlashcardApiTest extends TestCase
         $this->withToken($this->johnToken)->getJson('/api/sets')->assertOk()->assertExactJson([]);
     }
 
+    public function test_a_listed_set_reports_its_card_count(): void
+    {
+        $empty = $this->createSet($this->markToken, ['title' => 'Empty']);
+        $packed = $this->createSet($this->markToken, ['title' => 'Packed']);
+
+        $this->createCard($this->markToken, $packed['id'], 'let', 'block scope');
+        $second = $this->createCard($this->markToken, $packed['id'], 'const', 'cannot be reassigned');
+
+        $sets = $this->withToken($this->markToken)->getJson('/api/sets')->assertOk()->json();
+
+        // The list shape both clients read: cardsCount sits with the other fields.
+        $this->assertSame(
+            ['id', 'userId', 'title', 'description', 'cardsCount', 'createdAt', 'updatedAt'],
+            array_keys($sets[0])
+        );
+
+        // Keyed by id, because two sets created in the same second are ordered by id.
+        $byId = collect($sets)->keyBy('id');
+        $this->assertSame(0, $byId[$empty['id']]['cardsCount']);
+        $this->assertSame(2, $byId[$packed['id']]['cardsCount']);
+
+        // Counted from the rows, never cached on the set.
+        $this->withToken($this->markToken)
+            ->deleteJson("/api/cards/{$second['id']}")
+            ->assertNoContent();
+
+        $afterDelete = collect(
+            $this->withToken($this->markToken)->getJson('/api/sets')->assertOk()->json()
+        )->keyBy('id');
+
+        $this->assertSame(1, $afterDelete[$packed['id']]['cardsCount']);
+
+        // A single-set response deliberately has no count: the field is only there
+        // when the query asked for it, which keeps every write path cheap.
+        $single = $this->withToken($this->markToken)
+            ->getJson("/api/sets/{$empty['id']}")
+            ->assertOk()
+            ->json();
+
+        $this->assertArrayNotHasKey('cardsCount', $single);
+
+        // Counts never cross accounts: john still sees no sets at all.
+        $this->withToken($this->johnToken)->getJson('/api/sets')->assertOk()->assertExactJson([]);
+    }
+
     public function test_a_set_can_be_read_updated_and_deleted(): void
     {
         $set = $this->createSet($this->markToken);

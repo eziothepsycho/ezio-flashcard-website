@@ -87,7 +87,7 @@ loss. The sets and cards attached to that account move across intact.
 
 Steps 3–5 are now handled by the app itself; the rest is still worth doing by hand.
 
-1. **Backend ready** — ✅ `/api/import` exists, is throttled like everything else, and is covered by `backend/tests/Feature/ImportTest.php`.
+1. **Backend ready** — ✅ `/api/import` exists (behind the usual token; only `login` and `register` carry a rate limit) and is covered by `backend/tests/Feature/ImportTest.php`.
 2. **Website switched** — ✅ accounts and flashcard CRUD both go through the API when `VITE_DATA_MODE=api`.
 3. **Each person, on their own browser:**
    1. Log in on the website against the backend, using the same username as the

@@ -9,11 +9,12 @@
 
 import { loadAuth, saveAuth } from "./storage";
 import { adoptUnclaimedSets } from "./db";
-
-const MIN_USERNAME_LENGTH = 3;
-const MAX_USERNAME_LENGTH = 20;
-const USERNAME_PATTERN = /^[A-Za-z0-9_]+$/;
-const MIN_PASSWORD_LENGTH = 4;
+// The rules themselves live in shared/validation.js; the account screens have
+// always imported them from this module, which re-exports them further down.
+import {
+  validatePassword,
+  validateUsername,
+} from "../../shared/validation.js";
 
 // The same message whether the account is missing or the password is
 // wrong, so the login form can't be used to list who has an account.
@@ -70,54 +71,17 @@ function findByUsername(users, username) {
   return users.find((u) => u.usernameLower === wanted) || null;
 }
 
-// ---------- Validation (used by the forms and by register below) ----------
+// ---------- Validation ----------
 
-export function validateUsername(username) {
-  const trimmed = username.trim();
-  if (!trimmed) return "Enter a username.";
-  if (
-    trimmed.length < MIN_USERNAME_LENGTH ||
-    trimmed.length > MAX_USERNAME_LENGTH
-  ) {
-    return `Usernames need to be ${MIN_USERNAME_LENGTH}-${MAX_USERNAME_LENGTH} characters.`;
-  }
-  if (!USERNAME_PATTERN.test(trimmed)) {
-    return "Usernames can only use letters, numbers and underscores.";
-  }
-  return "";
-}
-
-export function validatePassword(password) {
-  if (!password) return "Enter a password.";
-  if (password.length < MIN_PASSWORD_LENGTH) {
-    return `Passwords need to be at least ${MIN_PASSWORD_LENGTH} characters.`;
-  }
-  return "";
-}
-
-export function validateRegistration({ username, password, confirmPassword }) {
-  const usernameError = validateUsername(username);
-  if (usernameError) return usernameError;
-  const passwordError = validatePassword(password);
-  if (passwordError) return passwordError;
-  if (password !== confirmPassword) return "Passwords don't match.";
-  return "";
-}
-
-// Login only asks that both fields are filled in. The register rules
-// (length, allowed characters) deliberately don't apply here — they would
-// lock out an account created under older rules — and anything more
-// specific would hint at which half of the credentials was wrong.
-//
-// Returns one message per field so an empty form can flag both at once.
-export function validateLogin({ username, password }) {
-  return {
-    username: username.trim() ? "" : "Username is required.",
-    // Passwords are never trimmed: leading or trailing spaces are part of
-    // the password, so only emptiness is checked.
-    password: password ? "" : "Password is required.",
-  };
-}
+// Moved to shared/validation.js so the website and the mobile app share exactly
+// one set of rules and messages. Re-exported here because the account screens
+// (and register() below) have always taken them from this module.
+export {
+  validateLogin,
+  validatePassword,
+  validateRegistration,
+  validateUsername,
+} from "../../shared/validation.js";
 
 // ---------- Account lifecycle ----------
 

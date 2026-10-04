@@ -32,6 +32,9 @@ backend/.env
 mobile/.expo/
 mobile/dist
 
+# Expo tooling state at the repo root (device list, dev logs) — never source
+.expo/
+
 # Local JSON dumps of browser data — contains real accounts, never commit it
 backups/
 

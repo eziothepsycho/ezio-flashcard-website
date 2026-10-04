@@ -1,10 +1,43 @@
 import "./QuizResults.css";
 
+// One reviewed question: the answer the user picked, plus the right
+// answer when they got it wrong.
+function ReviewItem({ entry, showCorrectAnswer }) {
+  const { question, selectedOptionId, number, isCorrect } = entry;
+  const selectedOption = question.options.find(
+    (option) => option.id === selectedOptionId
+  );
+  const correctOption = question.options.find(
+    (option) => option.id === question.correctOptionId
+  );
+
+  return (
+    <li className={"quiz-review-item " + (isCorrect ? "quiz-review-correct" : "quiz-review-incorrect")}>
+      <div className="quiz-review-heading">
+        <p className="quiz-review-question">{number}. {question.prompt}</p>
+        <span className="quiz-review-status">{isCorrect ? "Correct" : "Incorrect"}</span>
+      </div>
+      <p className="quiz-review-answer"><span>Your answer</span>{selectedOption.text}</p>
+      {showCorrectAnswer && (
+        <p className="quiz-review-answer quiz-review-correct-answer"><span>Correct answer</span>{correctOption.text}</p>
+      )}
+    </li>
+  );
+}
+
 function QuizResults({ answers, onBack, onTryAgain, onHome }) {
-  const correctCount = answers.filter(
-    ({ question, selectedOptionId }) => selectedOptionId === question.correctOptionId
-  ).length;
-  const incorrectCount = answers.length - correctCount;
+  // Tag every answer once with its quiz position and whether it was
+  // right, so both review groups can be split from the same data.
+  const reviewEntries = answers.map(({ question, selectedOptionId }, index) => ({
+    question,
+    selectedOptionId,
+    number: index + 1,
+    isCorrect: selectedOptionId === question.correctOptionId,
+  }));
+  const incorrectAnswers = reviewEntries.filter((entry) => !entry.isCorrect);
+  const correctAnswers = reviewEntries.filter((entry) => entry.isCorrect);
+  const correctCount = correctAnswers.length;
+  const incorrectCount = incorrectAnswers.length;
   const score = Math.round((correctCount / answers.length) * 100);
 
   return (
@@ -25,23 +58,32 @@ function QuizResults({ answers, onBack, onTryAgain, onHome }) {
       </section>
       <section className="quiz-review" aria-labelledby="review-title">
         <h3 id="review-title">Review answers</h3>
-        <ol className="quiz-review-list">
-          {answers.map(({ question, selectedOptionId }, index) => {
-            const selectedOption = question.options.find((option) => option.id === selectedOptionId);
-            const correctOption = question.options.find((option) => option.id === question.correctOptionId);
-            const isCorrect = selectedOptionId === question.correctOptionId;
-            return (
-              <li key={question.cardId} className={"quiz-review-item " + (isCorrect ? "quiz-review-correct" : "quiz-review-incorrect")}>
-                <div className="quiz-review-heading">
-                  <p className="quiz-review-question">{index + 1}. {question.prompt}</p>
-                  <span className="quiz-review-status">{isCorrect ? "Correct" : "Incorrect"}</span>
-                </div>
-                <p className="quiz-review-answer"><span>Your answer</span>{selectedOption.text}</p>
-                {!isCorrect && <p className="quiz-review-answer quiz-review-correct-answer"><span>Correct answer</span>{correctOption.text}</p>}
-              </li>
-            );
-          })}
-        </ol>
+
+        <section className="quiz-review-group" aria-labelledby="review-incorrect-title">
+          <h4 className="quiz-review-group-title" id="review-incorrect-title">Incorrect</h4>
+          {incorrectAnswers.length === 0 ? (
+            <p className="quiz-review-empty">No incorrect answers.</p>
+          ) : (
+            <ol className="quiz-review-list">
+              {incorrectAnswers.map((entry) => (
+                <ReviewItem key={entry.question.cardId} entry={entry} showCorrectAnswer />
+              ))}
+            </ol>
+          )}
+        </section>
+
+        <section className="quiz-review-group" aria-labelledby="review-correct-title">
+          <h4 className="quiz-review-group-title" id="review-correct-title">Correct</h4>
+          {correctAnswers.length === 0 ? (
+            <p className="quiz-review-empty">No correct answers.</p>
+          ) : (
+            <ol className="quiz-review-list">
+              {correctAnswers.map((entry) => (
+                <ReviewItem key={entry.question.cardId} entry={entry} showCorrectAnswer={false} />
+              ))}
+            </ol>
+          )}
+        </section>
       </section>
     </div>
   );

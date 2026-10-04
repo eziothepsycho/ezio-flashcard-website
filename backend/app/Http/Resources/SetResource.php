@@ -21,6 +21,10 @@ class SetResource extends JsonResource
             'userId' => $this->user_id,
             'title' => $this->title,
             'description' => $this->description,
+            // How many cards the set holds. Only present when the query asked for
+            // it (SetController::index uses withCount('cards')), so listing sets
+            // costs one extra query instead of one per set.
+            'cardsCount' => $this->whenCounted('cards'),
             'createdAt' => $this->created_at?->toISOString(),
             'updatedAt' => $this->updated_at?->toISOString(),
         ];

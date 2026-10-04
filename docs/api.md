@@ -82,17 +82,28 @@ counters (they live in the cache, not the database).
 
 | Method | Path | Body | Returns |
 | --- | --- | --- | --- |
-| GET | `/api/sets` | — | `200 [set]` — only mine, `ORDER BY created_at, id` (oldest first, matching today's array order) |
+| GET | `/api/sets` | — | `200 [set]` — only mine, `ORDER BY created_at, id` (oldest first, matching today's array order); each set includes `cardsCount` |
 | POST | `/api/sets` | `{title, description?, id?, createdAt?, updatedAt?}` | `201 set` |
 | GET | `/api/sets/{id}` | — | `200 set` or `404` |
 | PATCH | `/api/sets/{id}` | `{title?, description?}` | `200 set` (`updatedAt` refreshed server-side) |
 | DELETE | `/api/sets/{id}` | — | `204` — cards removed by the FK cascade |
 
 ```json
-// set
+// set — the six fields every set response has
 { "id": "6f1c…", "userId": "89be…", "title": "JavaScript", "description": "notes",
   "createdAt": "2026-01-31T12:00:00.000Z", "updatedAt": "2026-01-31T12:00:00.000Z" }
+
+// set in a GET /api/sets list — cardsCount is added by the list query
+{ "id": "6f1c…", "userId": "89be…", "title": "JavaScript", "description": "notes",
+  "cardsCount": 30,
+  "createdAt": "2026-01-31T12:00:00.000Z", "updatedAt": "2026-01-31T12:00:00.000Z" }
 ```
+
+`cardsCount` (added in Phase B) is how many cards the set holds, so a client can show
+"Networking Fundamentals · 30 cards" without a request per set. It is present only when the
+query counted cards: `GET /api/sets` does, with `withCount('cards')` — one extra query for the
+whole list — while `POST`, `GET /api/sets/{id}` and `PATCH` answer the six fields above without
+it. The number is read from the card rows, never cached on the set, so it cannot go stale.
 
 ## Cards
 
