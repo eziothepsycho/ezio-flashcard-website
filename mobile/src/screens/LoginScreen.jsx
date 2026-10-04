@@ -4,10 +4,11 @@ import { StyleSheet, Text } from "react-native";
 import { validateLogin } from "../../../shared/validation.js";
 import Button from "../components/Button";
 import Field from "../components/Field";
+import Logo from "../components/Logo";
 import Notice from "../components/Notice";
 import Screen from "../components/Screen";
 import { useSession } from "../lib/auth/session.js";
-import { colors, fontSize, fontWeight, spacing } from "../theme/tokens";
+import { colors, fontSize, spacing } from "../theme/tokens";
 
 export default function LoginScreen({ navigation }) {
   const { login, notice } = useSession();
@@ -45,7 +46,7 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <Screen centered>
-      <Text style={styles.wordmark}>cards.</Text>
+      <Logo />
       <Text style={styles.tagline}>Sign in to the same account as the website.</Text>
 
       {/* Why you are looking at this screen at all: only a session that expired
@@ -81,11 +82,6 @@ export default function LoginScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  wordmark: {
-    color: colors.ink,
-    fontSize: fontSize.xxl,
-    fontWeight: fontWeight.semibold,
-  },
   tagline: {
     color: colors.inkSecondary,
     fontSize: fontSize.md,

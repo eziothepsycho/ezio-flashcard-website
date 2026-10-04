@@ -4,6 +4,7 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 
 import { describeError } from "../lib/api/client.js";
 import Button from "../components/Button";
+import Logo from "../components/Logo";
 import Notice from "../components/Notice";
 import Screen from "../components/Screen";
 import SetCard from "../components/SetCard";
@@ -77,7 +78,7 @@ export default function HomeScreen({ navigation }) {
   return (
     <Screen onRefresh={refresh} refreshing={loading}>
       <View style={styles.header}>
-        <Text style={styles.wordmark}>cards.</Text>
+        <Logo layout="inline" markSize={40} />
         <Text style={styles.account}>Signed in as {user?.username}</Text>
       </View>
 
@@ -129,11 +130,6 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   header: {
     gap: spacing[1],
-  },
-  wordmark: {
-    color: colors.ink,
-    fontSize: fontSize.xxl,
-    fontWeight: fontWeight.semibold,
   },
   account: {
     color: colors.inkSecondary,

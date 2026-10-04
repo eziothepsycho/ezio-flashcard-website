@@ -143,6 +143,7 @@ function AuthScreen({ onLogin, onRegister }) {
   return (
     <div className="auth-screen">
       <div className="auth-card">
+        <img className="auth-logo" src="/cards-logo.png" alt="" width="72" height="72" />
         <h1 className="wordmark">cards.</h1>
         <p className="tagline">Your flashcard sets, studied your way.</p>
 

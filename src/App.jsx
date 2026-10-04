@@ -166,6 +166,7 @@ function App() {
     return (
       <div className="auth-screen">
         <div className="auth-card">
+          <img className="auth-logo" src="/cards-logo.png" alt="" width="72" height="72" />
           <h1 className="wordmark">cards.</h1>
           <p className="tagline">Restoring your session…</p>
         </div>
@@ -184,8 +185,11 @@ function App() {
     <div className="app">
       <header className="app-header">
         <div className="app-header-brand">
-          <h1 className="wordmark">cards.</h1>
-          <p className="tagline">Your flashcard sets, studied your way.</p>
+          <img className="brand-mark" src="/cards-logo.png" alt="" width="44" height="44" />
+          <div>
+            <h1 className="wordmark">cards.</h1>
+            <p className="tagline">Your flashcard sets, studied your way.</p>
+          </div>
         </div>
         <div className="app-account">
           <span className="app-account-name">Welcome, {user.username}</span>

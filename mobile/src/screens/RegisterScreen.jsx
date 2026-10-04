@@ -4,9 +4,10 @@ import { StyleSheet, Text } from "react-native";
 import { validateRegistration } from "../../../shared/validation.js";
 import Button from "../components/Button";
 import Field from "../components/Field";
+import Logo from "../components/Logo";
 import Screen from "../components/Screen";
 import { useSession } from "../lib/auth/session.js";
-import { colors, fontSize, fontWeight, spacing } from "../theme/tokens";
+import { colors, fontSize, spacing } from "../theme/tokens";
 
 export default function RegisterScreen({ navigation }) {
   const { register } = useSession();
@@ -46,7 +47,7 @@ export default function RegisterScreen({ navigation }) {
 
   return (
     <Screen centered>
-      <Text style={styles.wordmark}>cards.</Text>
+      <Logo />
       <Text style={styles.tagline}>
         A username and a password — nothing else is asked for.
       </Text>
@@ -83,11 +84,6 @@ export default function RegisterScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  wordmark: {
-    color: colors.ink,
-    fontSize: fontSize.xxl,
-    fontWeight: fontWeight.semibold,
-  },
   tagline: {
     color: colors.inkSecondary,
     fontSize: fontSize.md,
